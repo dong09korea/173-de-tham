@@ -2008,42 +2008,66 @@ window.addEventListener('resize', () => {
 const controlPanelEl = document.getElementById('control-panel');
 const btnHeaderPanel = document.getElementById('btn-header-panel');
 const btnClosePanel = document.getElementById('btn-close-panel');
+const drawerBackdrop = document.getElementById('drawer-backdrop');
 const floatingToggle = document.getElementById('floating-ui-toggle');
 const floatingText = document.getElementById('floating-toggle-text');
 const btnHeaderHideUi = document.getElementById('btn-header-hide-ui');
 
 let isUiHidden = false;
 
+function openDrawer() {
+  if (controlPanelEl) controlPanelEl.classList.add('mobile-open');
+  if (drawerBackdrop) drawerBackdrop.classList.add('active');
+}
+
+function closeDrawer() {
+  if (controlPanelEl) controlPanelEl.classList.remove('mobile-open');
+  if (drawerBackdrop) drawerBackdrop.classList.remove('active');
+}
+
 function setUiVisibility(hidden) {
   isUiHidden = hidden;
   document.body.classList.toggle('ui-hidden', isUiHidden);
+  closeDrawer();
   if (floatingText) {
     floatingText.textContent = isUiHidden ? '메뉴 보기' : 'UI 숨기기';
   }
 }
 
 if (floatingToggle) {
-  floatingToggle.addEventListener('click', () => {
+  floatingToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
     setUiVisibility(!isUiHidden);
   });
 }
 
 if (btnHeaderHideUi) {
-  btnHeaderHideUi.addEventListener('click', () => {
+  btnHeaderHideUi.addEventListener('click', (e) => {
+    e.stopPropagation();
     setUiVisibility(true);
   });
 }
 
-if (btnHeaderPanel && controlPanelEl) {
-  btnHeaderPanel.addEventListener('click', () => {
-    controlPanelEl.classList.toggle('mobile-open');
+if (btnHeaderPanel) {
+  btnHeaderPanel.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (controlPanelEl && controlPanelEl.classList.contains('mobile-open')) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
   });
 }
 
-if (btnClosePanel && controlPanelEl) {
-  btnClosePanel.addEventListener('click', () => {
-    controlPanelEl.classList.remove('mobile-open');
+if (btnClosePanel) {
+  btnClosePanel.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeDrawer();
   });
+}
+
+if (drawerBackdrop) {
+  drawerBackdrop.addEventListener('click', closeDrawer);
 }
 
 
