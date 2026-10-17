@@ -2016,12 +2016,17 @@ const btnHeaderHideUi = document.getElementById('btn-header-hide-ui');
 let isUiHidden = false;
 
 function openDrawer() {
-  if (controlPanelEl) controlPanelEl.classList.add('mobile-open');
+  if (controlPanelEl) {
+    controlPanelEl.classList.remove('panel-hidden');
+    controlPanelEl.classList.add('mobile-open');
+  }
   if (drawerBackdrop) drawerBackdrop.classList.add('active');
 }
 
 function closeDrawer() {
-  if (controlPanelEl) controlPanelEl.classList.remove('mobile-open');
+  if (controlPanelEl) {
+    controlPanelEl.classList.remove('mobile-open');
+  }
   if (drawerBackdrop) drawerBackdrop.classList.remove('active');
 }
 
@@ -2051,10 +2056,15 @@ if (btnHeaderHideUi) {
 if (btnHeaderPanel) {
   btnHeaderPanel.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (controlPanelEl && controlPanelEl.classList.contains('mobile-open')) {
-      closeDrawer();
+    if (!controlPanelEl) return;
+    if (window.innerWidth <= 768) {
+      if (controlPanelEl.classList.contains('mobile-open')) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
     } else {
-      openDrawer();
+      controlPanelEl.classList.toggle('panel-hidden');
     }
   });
 }
@@ -2062,7 +2072,11 @@ if (btnHeaderPanel) {
 if (btnClosePanel) {
   btnClosePanel.addEventListener('click', (e) => {
     e.stopPropagation();
-    closeDrawer();
+    if (window.innerWidth <= 768) {
+      closeDrawer();
+    } else if (controlPanelEl) {
+      controlPanelEl.classList.add('panel-hidden');
+    }
   });
 }
 

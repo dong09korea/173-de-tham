@@ -115,6 +115,10 @@ body {
   gap: 16px;
 }
 
+.control-panel.panel-hidden {
+  display: none !important;
+}
+
 .panel-section {
   display: flex;
   flex-direction: column;
