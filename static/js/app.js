@@ -1499,6 +1499,97 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     const tapBridge = new THREE.Mesh(new RoundedBoxGeometry(950, 420, 120, 3, 14), stainlessMat);
     tapBridge.position.set(12850, 1150, 1050);
     dGroup.add(barMosaicBase, barTerraTop, barTerraRiser, tapBridge);
+
+    // ------------------------------------------------------------------------
+    // 2F FRONT FULL GLASS WINDOW (50% TOP / 50% BOTTOM SPLIT — TOP PUSHED OUTWARD OPEN)
+    // Exact CAD f2_east_window opening: x = 23726.9 ~ 23929.7, z = 1270.3 ~ 4096.6 (width = 2826.3mm)
+    // ------------------------------------------------------------------------
+    const f2WinGroup = new THREE.Group();
+    const f2SashMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1c1f,
+      roughness: 0.28,
+      metalness: 0.78,
+    });
+    const f2GlassMat = new THREE.MeshPhysicalMaterial({
+      color: 0xeef4f8,
+      roughness: 0.05,
+      transmission: 0.86,
+      transparent: true,
+      opacity: 0.28,
+      reflectivity: 0.65,
+      clearcoat: 0.9,
+    });
+
+    const f2WinX = 23840;
+    const f2ZMin = 1270.3;
+    const f2ZMax = 4096.6;
+    const f2ZCenter = (f2ZMin + f2ZMax) / 2; // 2683.45
+    const f2TotalW = f2ZMax - f2ZMin; // 2826.3
+    const f2TotalH = floorHeight - 155; // 2845mm (reaching cleanly to 2F ceiling)
+    const f2MidY = f2TotalH * 0.5; // Exact 50% vertical split (1422.5mm)
+    const f2FrameT = 54;
+    const f2Depth = 92;
+
+    // Outer perimeter black metal sash frame
+    const f2TopRail = new THREE.Mesh(new THREE.BoxGeometry(f2Depth, f2FrameT, f2TotalW), f2SashMat);
+    f2TopRail.position.set(f2WinX, f2TotalH - f2FrameT / 2, f2ZCenter);
+    const f2BotSill = new THREE.Mesh(new THREE.BoxGeometry(f2Depth, f2FrameT, f2TotalW), f2SashMat);
+    f2BotSill.position.set(f2WinX, f2FrameT / 2, f2ZCenter);
+    const f2LeftJamb = new THREE.Mesh(new THREE.BoxGeometry(f2Depth, f2TotalH, f2FrameT), f2SashMat);
+    f2LeftJamb.position.set(f2WinX, f2TotalH / 2, f2ZMax - f2FrameT / 2);
+    const f2RightJamb = new THREE.Mesh(new THREE.BoxGeometry(f2Depth, f2TotalH, f2FrameT), f2SashMat);
+    f2RightJamb.position.set(f2WinX, f2TotalH / 2, f2ZMin + f2FrameT / 2);
+
+    // 50% Horizontal Center Transom Bar (dividing top 50% & bottom 50%)
+    const f2MidTransom = new THREE.Mesh(new THREE.BoxGeometry(f2Depth + 6, 58, f2TotalW), f2SashMat);
+    f2MidTransom.position.set(f2WinX, f2MidY, f2ZCenter);
+    f2WinGroup.add(f2TopRail, f2BotSill, f2LeftJamb, f2RightJamb, f2MidTransom);
+
+    // Bottom 50% Fixed Clear Glass Window (y: f2FrameT ~ f2MidY - 29)
+    const f2BotGlassH = f2MidY - 29 - f2FrameT;
+    const f2InnerW = f2TotalW - f2FrameT * 2;
+    const f2FixedBotGlass = new THREE.Mesh(new THREE.BoxGeometry(16, f2BotGlassH, f2InnerW), f2GlassMat);
+    f2FixedBotGlass.position.set(f2WinX, f2FrameT + f2BotGlassH / 2, f2ZCenter);
+    f2WinGroup.add(f2FixedBotGlass);
+
+    // Top 50% Outward Push-Open Awning Window (y: f2MidY + 29 ~ f2TotalH - f2FrameT)
+    const f2TopAwningH = f2TotalH - f2FrameT - (f2MidY + 29);
+    const f2AwningPivot = new THREE.Group();
+    f2AwningPivot.position.set(f2WinX + 36, f2TotalH - f2FrameT, f2ZCenter);
+    // Pushed all the way outward toward +X street side (~77 degrees open!)
+    f2AwningPivot.rotation.z = 1.35;
+
+    const f2SashT = 48;
+    const f2AwTop = new THREE.Mesh(new THREE.BoxGeometry(60, f2SashT, f2InnerW - 8), f2SashMat);
+    f2AwTop.position.set(0, -f2SashT / 2, 0);
+    const f2AwBot = new THREE.Mesh(new THREE.BoxGeometry(60, f2SashT, f2InnerW - 8), f2SashMat);
+    f2AwBot.position.set(0, -f2TopAwningH + f2SashT / 2, 0);
+    const f2AwLeft = new THREE.Mesh(new THREE.BoxGeometry(60, f2TopAwningH, f2SashT), f2SashMat);
+    f2AwLeft.position.set(0, -f2TopAwningH / 2, (f2InnerW - 8) / 2 - f2SashT / 2);
+    const f2AwRight = new THREE.Mesh(new THREE.BoxGeometry(60, f2TopAwningH, f2SashT), f2SashMat);
+    f2AwRight.position.set(0, -f2TopAwningH / 2, -(f2InnerW - 8) / 2 + f2SashT / 2);
+    const f2AwGlass = new THREE.Mesh(
+      new THREE.BoxGeometry(16, f2TopAwningH - f2SashT * 2, f2InnerW - f2SashT * 2 - 8),
+      f2GlassMat
+    );
+    f2AwGlass.position.set(0, -f2TopAwningH / 2, 0);
+    f2AwningPivot.add(f2AwTop, f2AwBot, f2AwLeft, f2AwRight, f2AwGlass);
+    f2WinGroup.add(f2AwningPivot);
+
+    // Left & Right Black Metal Stay Arms holding the 2F top 50% awning window wide open outward
+    [f2ZMin + 90, f2ZMax - 90].forEach((armZ) => {
+      const stayArm = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 860, 10), f2SashMat);
+      stayArm.position.set(f2WinX + 360, f2TotalH - f2FrameT - 480, armZ);
+      stayArm.rotation.z = -0.76;
+      f2WinGroup.add(stayArm);
+    });
+
+    // Subtle exterior facade light for 2F window frame visibility
+    const f2ExteriorLight = new THREE.PointLight(0xfff5e8, 0.85, 5200, 0);
+    f2ExteriorLight.position.set(25200, 2200, f2ZCenter);
+    f2WinGroup.add(f2ExteriorLight);
+
+    dGroup.add(f2WinGroup);
   }
 
   return dGroup;
@@ -1577,6 +1668,7 @@ function buildModel() {
     fGroup.add(wallContainer);
 
     fData.outer_walls.forEach((w) => {
+      if (w.id === 'f2_east_window') return; // Replaced by 2F 50/50 Push-Out Front Glass Window
       const isGlass = !!w.glass;
       const mat = isGlass
         ? new THREE.MeshPhysicalMaterial({
@@ -1773,11 +1865,11 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
       setCeilingVisibility(true);
-      updateFloorMode('1');
-      // Exact street-level front exterior perspective looking straight at the 1F Entrance Facade (matching Photo 4!)
-      camera.position.set(27200, 1650, 2380);
-      controls.target.set(17500, 1550, 2380);
-      banner.textContent = '🚪 1F 입구 외관 시점: 노출 콘크리트 파사드 + 블랙 샷시 & 유리 (좌측 출입문 / 우측 하단 고정창 / 우측 상단 프로젝트 개폐창)';
+      updateFloorMode('all');
+      // Street-level exterior perspective showing both 1F Entrance Facade & 2F 50/50 Push-Out Front Window
+      camera.position.set(29800, 2500, 2500);
+      controls.target.set(22000, 2650, 2500);
+      banner.textContent = '🚪 1F·2F 전면 외관 시점: 1층 노출 콘크리트 파사드(우측 상단 프로젝트 창) + 2층 전면 통유리(상하 50% 분할 상단 개폐창)';
     } else if (preset === 'f1_walk') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
