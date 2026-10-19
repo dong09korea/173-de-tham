@@ -1927,39 +1927,8 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(facadeGroup);
 
     // ------------------------------------------------------------------------
-    // 6) 7 FLUTED ROUND WALL SCONCES ON LEFT WALL (50% HEIGHT = 10% LOWERED FROM 60%)
+    // 6) LEFT WALL SCONCES & MIRRORS REMOVED (Per user request)
     // ------------------------------------------------------------------------
-    const sconceY = floorHeight * 0.50; // 50% height from bottom (1850mm, lowered 10% from 60%)
-    const leftWallSconceX = [20400, 17200, 14000, 10800, 7600, 4400, 1200];
-    const slopeAngle = -Math.atan2(4241.4 - 3707.6, 9558.6 - -339.3);
-
-    leftWallSconceX.forEach((sx) => {
-      let sz = 4241.4;
-      let sRotY = 0;
-      if (sx < 9558.6) {
-        const t = (sx - -339.3) / (9558.6 - -339.3);
-        sz = 3707.6 + t * (4241.4 - 3707.6);
-        sRotY = slopeAngle;
-      }
-      dGroup.add(createFlutedRoundWallSconce(sx, sconceY, sz, sRotY));
-    });
-
-    // ------------------------------------------------------------------------
-    // 7) 4 TILTED WIDE WOODEN-FRAMED MIRRORS RIGHT ABOVE LEFT WALL SCONCES (5% LOWERED)
-    // ------------------------------------------------------------------------
-    const mirrorY = floorHeight * 0.55 + 620; // Lowered 5% of floor height (2840mm -> 2655mm, spanning 2315mm ~ 2995mm above the 1850mm sconces)
-    const leftWallMirrorX = [19600, 14000, 7600, 2000];
-
-    leftWallMirrorX.forEach((mx) => {
-      let mz = 4241.4;
-      let mRotY = 0;
-      if (mx < 9558.6) {
-        const t = (mx - -339.3) / (9558.6 - -339.3);
-        mz = 3707.6 + t * (4241.4 - 3707.6);
-        mRotY = slopeAngle;
-      }
-      dGroup.add(createTiltedWideWallMirror(mx, mirrorY, mz, mRotY, 3100, 680));
-    });
   } else if (fNum === 2) {
     // ------------------------------------------------------------------------
     // 2F FRONT FULL GLASS WINDOW (50% TOP / 50% BOTTOM SPLIT — TOP PUSHED OUTWARD OPEN)
@@ -2299,6 +2268,8 @@ function buildModel() {
   // Warm ambient interior lighting across 1F & 2F halls
   const warmHallLights = [
     { f: 1, x: 19800, y: 2650, z: 2300 },
+    { f: 1, x: 13500, y: 2650, z: 2300 },
+    { f: 1, x: 6500, y: 2650, z: 2300 },
     { f: 2, x: 12850, y: 2550, z: 1500 },
     { f: 2, x: 18200, y: 2550, z: 1900 },
     { f: 2, x: 21900, y: 2550, z: 2100 },
@@ -2389,7 +2360,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       updateFloorMode('1');
       camera.position.set(10200, 1650, 3400);
       controls.target.set(16800, 1550, 2200);
-      banner.textContent = '🎧 1F DJ 부스 & 다이닝 홀 시점: 화이트 페인트 벽 + 원형 플루티드 글래스 벽등 + 화이트 테라조 바닥';
+      banner.textContent = '🎧 1F DJ 부스 & 다이닝 홀 시점: 깨끗한 화이트 페인트 벽면 + 화이트 테라조 바닥';
     } else if (preset === 'f2_beer') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
