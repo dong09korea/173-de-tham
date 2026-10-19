@@ -1477,18 +1477,20 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     curbMesh.receiveShadow = true;
     facadeGroup.add(curbMesh);
 
-    // 5-B) Top Exposed Concrete Header Beam (z: 314.5 ~ 4444.1, y: 2480 ~ 3500)
-    const headerGeom = new THREE.BoxGeometry(535, 1020, 4130);
-    applyBoxUV(headerGeom, 2065, 1020);
+    // 5-B) Top Exposed Concrete Header Beam (z: 314.5 ~ 4444.1, y: 2480 ~ floorHeight)
+    const headerH = floorHeight - 2480;
+    const headerY = 2480 + headerH / 2;
+    const headerGeom = new THREE.BoxGeometry(535, headerH, 4130);
+    applyBoxUV(headerGeom, 2065, headerH);
     const headerMesh = new THREE.Mesh(headerGeom, facadeConcreteMat);
-    headerMesh.position.set(22790, 2990, 2379.3);
+    headerMesh.position.set(22790, headerY, 2379.3);
     headerMesh.castShadow = true;
     headerMesh.receiveShadow = true;
     facadeGroup.add(headerMesh);
 
     // Subtle vertical joint seam in the center of the top concrete header (matching Photo 4!)
-    const headerSeam = new THREE.Mesh(new THREE.BoxGeometry(542, 1020, 12), sashFrameMat);
-    headerSeam.position.set(22790, 2990, 2379.3);
+    const headerSeam = new THREE.Mesh(new THREE.BoxGeometry(542, headerH, 12), sashFrameMat);
+    headerSeam.position.set(22790, headerY, 2379.3);
     facadeGroup.add(headerSeam);
 
     // 5-C) Left & Right Exposed Concrete Side Pillars (y: 140 ~ 2480)

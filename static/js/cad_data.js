@@ -1,6 +1,6 @@
 window.CAD_DATA = {
   "1": {
-    "height": 3500,
+    "height": 3700,
     "elevation": 0,
     "plan_texture": "./static/textures/floor1_plan.png",
     "texture_bounds_mm": {
@@ -128,7 +128,7 @@ window.CAD_DATA = {
             0.0
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "color": "#d6d3cd"
       },
       {
@@ -195,7 +195,7 @@ window.CAD_DATA = {
             4444.1
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "color": "#d6d3cd"
       },
       {
@@ -218,7 +218,7 @@ window.CAD_DATA = {
             475.9
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "color": "#b8b4ac"
       },
       {
@@ -241,7 +241,7 @@ window.CAD_DATA = {
             177.9
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "color": "#b8b4ac"
       },
       {
@@ -264,7 +264,7 @@ window.CAD_DATA = {
             4444.1
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "color": "#b8b4ac"
       },
       {
@@ -287,7 +287,7 @@ window.CAD_DATA = {
             4241.4
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "color": "#b8b4ac"
       }
     ],
@@ -312,7 +312,7 @@ window.CAD_DATA = {
             86.9
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_wc_nam_bot",
@@ -334,7 +334,7 @@ window.CAD_DATA = {
             2739.3
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_wc_nam_right",
@@ -356,7 +356,7 @@ window.CAD_DATA = {
             417.9
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_wc_nam_stub",
@@ -378,7 +378,7 @@ window.CAD_DATA = {
             2851.0
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_wc_nu_right",
@@ -400,7 +400,7 @@ window.CAD_DATA = {
             285.5
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_wc_nu_bot",
@@ -422,7 +422,7 @@ window.CAD_DATA = {
             2871.7
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_dish_left",
@@ -444,7 +444,7 @@ window.CAD_DATA = {
             409.7
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_dish_bot1",
@@ -466,7 +466,7 @@ window.CAD_DATA = {
             2789.0
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_dish_bot2",
@@ -492,7 +492,7 @@ window.CAD_DATA = {
             2842.8
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_dish_right",
@@ -518,7 +518,7 @@ window.CAD_DATA = {
             2838.6
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_gas_left",
@@ -540,7 +540,7 @@ window.CAD_DATA = {
             1336.6
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_gas_right",
@@ -562,7 +562,7 @@ window.CAD_DATA = {
             1336.6
           ]
         ],
-        "h": 3200
+        "h": 3400
       },
       {
         "id": "f1_front_glass",
@@ -584,7 +584,7 @@ window.CAD_DATA = {
             2842.8
           ]
         ],
-        "h": 3500,
+        "h": 3700,
         "glass": true
       }
     ],
@@ -1494,7 +1494,7 @@ window.CAD_DATA = {
   },
   "2": {
     "height": 3000,
-    "elevation": 3500,
+    "elevation": 3700,
     "plan_texture": "./static/textures/floor2_plan.png",
     "texture_bounds_mm": {
       "x0": -3881.4,
@@ -2724,7 +2724,7 @@ window.CAD_DATA = {
   },
   "3": {
     "height": 3000,
-    "elevation": 6500,
+    "elevation": 6700,
     "plan_texture": "./static/textures/floor3_plan.png",
     "texture_bounds_mm": {
       "x0": -3881.4,
