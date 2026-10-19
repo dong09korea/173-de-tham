@@ -1926,15 +1926,23 @@ function buildModel() {
       fixGroup.add(detailedModel);
     });
 
-    // 4-Legged Tubular Chrome & Cognac-Brown Leather Bar Chairs at exact CAD stool coordinates
+    // 4-Legged Tubular Chrome & Cognac-Brown Leather Bar Chairs (pulled outside bar wall & countertop overhang)
     fData.stools.forEach((pt) => {
+      let sx = pt[0];
+      let sz = pt[1];
       let sRot = 0;
-      if (fNum === 1 && pt[0] > 18000) {
-        sRot = Math.PI / 2; // Side L-bar seats face -X toward the side bar counter
+      if (fNum === 1) {
+        if (pt[0] > 18000) {
+          sx = 18440; // Outside side mosaic wall (x=18070) & countertop overhang (x=18220)
+          sRot = Math.PI / 2; // Side L-bar seats face -X toward the side bar counter
+        } else {
+          sz = 3425; // Outside front mosaic wall (z=3060) & countertop overhang (z=3210)
+          sRot = 0; // Front bar seats face -Z toward the front bar counter
+        }
       } else if (fNum === 2) {
         sRot = Math.atan2(-(12850 - pt[0]), -(520 - pt[1])); // Face center of 2F semi-circular beer bar
       }
-      const stool = createIndustrialMetalStool(pt[0], pt[1], sRot);
+      const stool = createIndustrialMetalStool(sx, sz, sRot);
       fixGroup.add(stool);
     });
 
