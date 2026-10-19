@@ -263,6 +263,16 @@ const burgundyTileMat = new THREE.MeshPhysicalMaterial({
   clearcoatRoughness: 0.22,
 });
 
+// Warm Architectural Cream Emulsion Paint (Above White Tile in Kitchen Area Only)
+const kitchenCreamPaintMat = new THREE.MeshStandardMaterial({
+  map: PBR_TEX.wallWhitePaintTex,
+  bumpMap: PBR_TEX.wallWhitePaintTex,
+  bumpScale: 0.35,
+  color: 0xf5eee1, // Warm architectural cream paint
+  roughness: 0.88,
+  metalness: 0.0,
+});
+
 // Linear LED Strip Lighting at 1600mm inside Bathrooms (Warm Glowing Strip)
 const ledStripGlowMat = new THREE.MeshStandardMaterial({
   color: 0xfff4dc,
@@ -1604,18 +1614,10 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     kitchenTileWall.receiveShadow = true;
     dGroup.add(kitchenTileWall);
 
-    // Upper section (y: 2040mm ~ 3700mm ceiling): Fine Fair-faced exposed concrete wall
+    // Upper section (y: 2040mm ~ 3700mm ceiling): Warm Cream-colored paint (kitchen area only)
     const creamWallH = Math.max(200, floorHeight - tileWallH);
-    const creamPaintMat = new THREE.MeshStandardMaterial({
-      map: PBR_TEX.wallExposedConcreteTex,
-      bumpMap: PBR_TEX.wallExposedConcreteTex,
-      bumpScale: 0.38,
-      color: 0xd6d6d2,
-      roughness: 0.82,
-      metalness: 0.02,
-    });
-    const kitchenCreamUpperWall = new THREE.Mesh(new THREE.BoxGeometry(9250, creamWallH, 28), creamPaintMat);
-    applyBoxUV(kitchenCreamUpperWall.geometry, 3200, 3200);
+    const kitchenCreamUpperWall = new THREE.Mesh(new THREE.BoxGeometry(9250, creamWallH, 28), kitchenCreamPaintMat);
+    applyBoxUV(kitchenCreamUpperWall.geometry, 2000, 2000);
     kitchenCreamUpperWall.position.set(13600, tileWallH + creamWallH / 2, 550);
     kitchenCreamUpperWall.receiveShadow = true;
     dGroup.add(kitchenCreamUpperWall);
@@ -2179,8 +2181,8 @@ function buildModel() {
         // Bathroom Walls: 0 ~ 160cm Burgundy Tile Wainscot + LED Strip Lighting at 160cm + Fair-Faced Concrete Wall above
         mesh = createSplitWallMesh(w.poly, w.h, 1600, burgundyTileMat, mat, ledStripGlowMat);
       } else if (kitchenTileWallIds.has(w.id)) {
-        // Kitchen Wall (Next to Sink): White Mosaic Tile up to 2040mm matching Kitchen Back Wall + Fair-Faced Concrete above
-        mesh = createSplitWallMesh(w.poly, w.h, 2040, whiteMosaicTileMat, mat, darkMetalMat);
+        // Kitchen Wall (Next to Sink): White Mosaic Tile up to 2040mm matching Kitchen Back Wall + Cream Paint above
+        mesh = createSplitWallMesh(w.poly, w.h, 2040, whiteMosaicTileMat, kitchenCreamPaintMat, darkMetalMat);
       } else {
         mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
       }
@@ -2370,7 +2372,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Perspective matching Photo 3 (looking along the L-shaped terracotta bar & illustrated canopy!)
       camera.position.set(18750, 1620, 3550);
       controls.target.set(11800, 1500, 2150);
-      banner.textContent = '🍷 1F 오픈키친 바 시점: 시원하게 개방된 오픈키친 + 2단 내추럴 오크 상판 & 버건디 타일 바 카운터 + 주방 화이트 타일 벽면';
+      banner.textContent = '🍷 1F 오픈키친 바 시점: 오픈키친(화이트 타일 + 상부 크림색 페인트) + 내추럴 오크 & 버건디 타일 바 카운터';
     } else if (preset === 'f1_dj') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
