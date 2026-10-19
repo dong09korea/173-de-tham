@@ -1691,7 +1691,7 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(barShadowL, barShadowR);
 
     // 4-A) Left Bar Section (x: 9190 ~ 14350, z: 2850)
-    const mosaicBaseL = new THREE.Mesh(new THREE.BoxGeometry(5160, 880, 420), whiteMosaicTileMat);
+    const mosaicBaseL = new THREE.Mesh(new THREE.BoxGeometry(5160, 880, 420), burgundyTileMat);
     applyBoxUV(mosaicBaseL.geometry, 480, 480);
     mosaicBaseL.position.set(11770, 440, 2850);
     mosaicBaseL.castShadow = true;
@@ -1713,7 +1713,7 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(mosaicBaseL, terraTopL, terraRiserL);
 
     // 4-B) Right Bar Section (x: 15330 ~ 18080, z: 2850) + L-Corner Turn (x: 17880, z: 550 ~ 2910)
-    const mosaicBaseR = new THREE.Mesh(new THREE.BoxGeometry(2750, 880, 420), whiteMosaicTileMat);
+    const mosaicBaseR = new THREE.Mesh(new THREE.BoxGeometry(2750, 880, 420), burgundyTileMat);
     applyBoxUV(mosaicBaseR.geometry, 480, 480);
     mosaicBaseR.position.set(16705, 440, 2850);
     mosaicBaseR.castShadow = true;
@@ -1733,7 +1733,7 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(mosaicBaseR, terraTopR, terraRiserR);
 
     // Side L-Return Section (x: 17880, z: 550 ~ 2910)
-    const mosaicBaseSide = new THREE.Mesh(new THREE.BoxGeometry(380, 880, 2360), whiteMosaicTileMat);
+    const mosaicBaseSide = new THREE.Mesh(new THREE.BoxGeometry(380, 880, 2360), burgundyTileMat);
     applyBoxUV(mosaicBaseSide.geometry, 480, 480);
     mosaicBaseSide.position.set(17880, 440, 1730);
     mosaicBaseSide.castShadow = true;
@@ -2370,7 +2370,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Perspective matching Photo 3 (looking along the L-shaped terracotta bar & illustrated canopy!)
       camera.position.set(18750, 1620, 3550);
       controls.target.set(11800, 1500, 2150);
-      banner.textContent = '🍷 1F 오픈키친 바 시점: 시원하게 개방된 높은 층고의 오픈키친 + 2단 내추럴 오크 바 카운터 + 주방 타일 벽면';
+      banner.textContent = '🍷 1F 오픈키친 바 시점: 시원하게 개방된 오픈키친 + 2단 내추럴 오크 상판 & 버건디 타일 바 카운터 + 주방 화이트 타일 벽면';
     } else if (preset === 'f1_dj') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
