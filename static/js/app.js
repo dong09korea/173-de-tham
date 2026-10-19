@@ -296,10 +296,14 @@ const contactShadowMat = new THREE.MeshBasicMaterial({
 });
 
 // ============================================================================
-// GENERAL STORE LIGHTS TURNED OFF (Only installed fixture lights active)
+// SOFT BASE AMBIENT + INSTALLED FIXTURE LIGHTS
 // ============================================================================
-const ambientLight = new THREE.AmbientLight(0xffe8cc, 0.06);
+const ambientLight = new THREE.AmbientLight(0xfff2e2, 0.22);
 scene.add(ambientLight);
+
+const hemiLight = new THREE.HemisphereLight(0xfff5e6, 0x26211d, 0.18);
+hemiLight.position.set(14000, 12000, 2200);
+scene.add(hemiLight);
 
 const dirLight = new THREE.DirectionalLight(0xfffaf0, 0.0);
 dirLight.position.set(18000, 28000, 20000);
@@ -1083,11 +1087,12 @@ function createIllustratedLightBoxCanopy(xCenter, zCenter, width, depth, bottomY
     canopyGroup.add(rod);
   });
 
-  // Warm downward illumination from the light box onto the burgundy bar counter & open kitchen
-  const lightLeft = new THREE.PointLight(0xffcf78, 2.4, 4600, 1.45);
-  lightLeft.position.set(-width * 0.25, bottomY - 50, 0);
-  const lightRight = new THREE.PointLight(0xffcf78, 2.4, 4600, 1.45);
-  lightRight.position.set(width * 0.25, bottomY - 50, 0);
+  // Warm downward illumination from the light box onto the burgundy bar counter, stools, kitchen & floor
+  // Note: decay = 0 is required because scene coordinates are in millimeters (1000mm = 1m)
+  const lightLeft = new THREE.PointLight(0xffe2a8, 1.4, 7500, 0);
+  lightLeft.position.set(-width * 0.25, bottomY - 60, 0);
+  const lightRight = new THREE.PointLight(0xffe2a8, 1.4, 7500, 0);
+  lightRight.position.set(width * 0.25, bottomY - 60, 0);
   canopyGroup.add(lightLeft, lightRight);
 
   return canopyGroup;
@@ -1133,7 +1138,7 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(exhaustHood);
 
     // Warm under-hood task light illuminating the cooking line (Photo 3 left background)
-    const hoodLight = new THREE.PointLight(0xffe0a3, 1.4, 3200, 1.5);
+    const hoodLight = new THREE.PointLight(0xffe4ad, 1.1, 5200, 0);
     hoodLight.position.set(10650, 1920, 950);
     dGroup.add(hoodLight);
 
