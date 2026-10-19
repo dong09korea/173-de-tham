@@ -66,6 +66,9 @@ function loadArchitecturalTextures() {
   // Photo 4: 1F Storefront Exterior Exposed Concrete Facade Texture
   const facadeConcreteTex = loadPbr('./static/textures/facade_exposed_concrete.jpg', 1, 1);
 
+  // Clean Architectural Matte White Paint Wall Texture
+  const wallWhitePaintTex = loadPbr('./static/textures/wall_white_paint.jpg', 1, 1);
+
   const timberTex = loadPbr('./static/textures/wood_walnut_grain.jpg', 1, 1);
   const graniteTex = loadPbr('./static/textures/stone_speckled_granite.jpg', 1, 1);
 
@@ -85,6 +88,7 @@ function loadArchitecturalTextures() {
   return {
     floorTerrazzoTex,
     wallConcreteTex,
+    wallWhitePaintTex,
     whiteMosaicTex,
     canopyArtTex,
     facadeConcreteTex,
@@ -1590,12 +1594,15 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     kitchenTileWall.receiveShadow = true;
     dGroup.add(kitchenTileWall);
 
-    // Upper section (y: 2040mm ~ 3700mm ceiling): Smooth warm cream paint (as seen above the tile line in Photo 3!)
+    // Upper section (y: 2040mm ~ 3700mm ceiling): Clean architectural matte white paint
     const creamWallH = Math.max(200, floorHeight - tileWallH);
     const creamPaintMat = new THREE.MeshStandardMaterial({
-      color: 0xede4d0,
+      map: PBR_TEX.wallWhitePaintTex,
+      bumpMap: PBR_TEX.wallWhitePaintTex,
+      bumpScale: 0.5,
+      color: 0xfcfbfa,
       roughness: 0.88,
-      metalness: 0.01,
+      metalness: 0.0,
     });
     const kitchenCreamUpperWall = new THREE.Mesh(new THREE.BoxGeometry(9250, creamWallH, 28), creamPaintMat);
     kitchenCreamUpperWall.position.set(13600, tileWallH + creamWallH / 2, 550);
@@ -1736,13 +1743,14 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     // ------------------------------------------------------------------------
     const facadeGroup = new THREE.Group();
 
+    // Clean Architectural Matte White Paint Facade Frame Material (Header & Pillars)
     const facadeConcreteMat = new THREE.MeshStandardMaterial({
-      map: PBR_TEX.facadeConcreteTex,
-      bumpMap: PBR_TEX.facadeConcreteTex,
-      bumpScale: 1.8,
-      color: 0xd8d6d2,
-      roughness: 0.80,
-      metalness: 0.05,
+      map: PBR_TEX.wallWhitePaintTex,
+      bumpMap: PBR_TEX.wallWhitePaintTex,
+      bumpScale: 0.5,
+      color: 0xfcfbfa,
+      roughness: 0.88,
+      metalness: 0.0,
     });
 
     // Architectural Deep Burgundy Entrance Sash Frame Material (#4E1218)
@@ -2132,12 +2140,12 @@ function buildModel() {
             opacity: 0.42,
           })
         : new THREE.MeshStandardMaterial({
-            map: PBR_TEX.wallConcreteTex,
-            bumpMap: PBR_TEX.wallConcreteTex,
-            bumpScale: 1.4,
-            color: 0xd8d5d0,
-            roughness: 0.84,
-            metalness: 0.04,
+            map: PBR_TEX.wallWhitePaintTex,
+            bumpMap: PBR_TEX.wallWhitePaintTex,
+            bumpScale: 0.5,
+            color: 0xfcfbfa,
+            roughness: 0.88,
+            metalness: 0.0,
           });
       const mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
       mesh.userData = {
@@ -2151,7 +2159,7 @@ function buildModel() {
       interactiveMeshes.push(mesh);
     });
 
-    // 4. Inner Partition Walls (Photo 2 Raw Concrete & Framed Glass VIP Partitions)
+    // 4. Inner Partition Walls (Clean Architectural Matte White Paint & Framed Glass Partitions)
     const wcWallIds = new Set([
       'f1_wc_nam_left', 'f1_wc_nam_bot', 'f1_wc_nam_right', 'f1_wc_nam_stub',
       'f1_wc_nu_right', 'f1_wc_nu_bot', 'f1_dish_left',
@@ -2171,20 +2179,20 @@ function buildModel() {
             opacity: 0.44,
           })
         : new THREE.MeshStandardMaterial({
-            map: PBR_TEX.wallConcreteTex,
-            bumpMap: PBR_TEX.wallConcreteTex,
-            bumpScale: 1.2,
-            color: 0xdedbd6,
-            roughness: 0.82,
-            metalness: 0.04,
+            map: PBR_TEX.wallWhitePaintTex,
+            bumpMap: PBR_TEX.wallWhitePaintTex,
+            bumpScale: 0.5,
+            color: 0xfcfbfa,
+            roughness: 0.88,
+            metalness: 0.0,
           });
 
       let mesh;
       if (wcWallIds.has(w.id)) {
-        // Bathroom Walls: 0 ~ 160cm Burgundy Tile Wainscot + LED Strip Lighting at 160cm + Exposed Raw Concrete above
+        // Bathroom Walls: 0 ~ 160cm Burgundy Tile Wainscot + LED Strip Lighting at 160cm + White Paint Wall above
         mesh = createSplitWallMesh(w.poly, w.h, 1600, burgundyTileMat, mat, ledStripGlowMat);
       } else if (kitchenTileWallIds.has(w.id)) {
-        // Kitchen Wall (Next to Sink): White Mosaic Tile up to 2040mm matching Kitchen Back Wall + Exposed Concrete above
+        // Kitchen Wall (Next to Sink): White Mosaic Tile up to 2040mm matching Kitchen Back Wall + White Paint above
         mesh = createSplitWallMesh(w.poly, w.h, 2040, whiteMosaicTileMat, mat, darkMetalMat);
       } else {
         mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
@@ -2355,7 +2363,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       updateFloorMode('all');
       camera.position.set(11000, 15500, 18500);
       controls.target.set(11500, 2200, 2200);
-      banner.textContent = '3D 전체 완공 조감도 시점: 화이트 테라조 타일 바닥 + 노출 콘크리트 벽 + 1층 오픈키친';
+      banner.textContent = '3D 전체 완공 조감도 시점: 화이트 테라조 타일 바닥 + 화이트 페인트 벽 + 1층 오픈키친';
     } else if (preset === 'f1_facade') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
@@ -2364,7 +2372,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Street-level exterior perspective showing both 1F Entrance Facade & 2F 50/50 Push-Out Front Window
       camera.position.set(29800, 2500, 2500);
       controls.target.set(22000, 2650, 2500);
-      banner.textContent = '🚪 1F·2F 전면 외관 시점: 1층 노출 콘크리트 파사드(우측 상단 프로젝트 창) + 2층 전면 통유리(상하 50% 분할 상단 개폐창)';
+      banner.textContent = '🚪 1F·2F 전면 외관 시점: 1층 화이트 파사드(버건디 프레임 샷시) + 2층 전면 통유리(상하 50% 분할 상단 개폐창)';
     } else if (preset === 'f1_walk') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
@@ -2381,7 +2389,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       updateFloorMode('1');
       camera.position.set(10200, 1650, 3400);
       controls.target.set(16800, 1550, 2200);
-      banner.textContent = '🎧 1F DJ 부스 & 다이닝 홀 시점: 노출 콘크리트 빈티지 벽 + 앤티크 브론즈 벨 벽등 + 화이트 테라조 바닥';
+      banner.textContent = '🎧 1F DJ 부스 & 다이닝 홀 시점: 화이트 페인트 벽 + 원형 플루티드 글래스 벽등 + 화이트 테라조 바닥';
     } else if (preset === 'f2_beer') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
