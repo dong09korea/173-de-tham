@@ -312,7 +312,7 @@ window.CAD_DATA = {
             86.9
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_wc_nam_bot",
@@ -334,7 +334,7 @@ window.CAD_DATA = {
             2739.3
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_wc_nam_right",
@@ -356,7 +356,7 @@ window.CAD_DATA = {
             417.9
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_wc_nam_stub",
@@ -378,7 +378,7 @@ window.CAD_DATA = {
             2851.0
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_wc_nu_right",
@@ -400,7 +400,7 @@ window.CAD_DATA = {
             285.5
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_wc_nu_bot",
@@ -422,7 +422,7 @@ window.CAD_DATA = {
             2871.7
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_dish_left",
@@ -444,7 +444,7 @@ window.CAD_DATA = {
             409.7
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_dish_bot1",
@@ -466,7 +466,7 @@ window.CAD_DATA = {
             2789.0
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_dish_bot2",
@@ -492,7 +492,7 @@ window.CAD_DATA = {
             2842.8
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_dish_right",
@@ -518,7 +518,7 @@ window.CAD_DATA = {
             2838.6
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_gas_left",
@@ -540,7 +540,7 @@ window.CAD_DATA = {
             1336.6
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_gas_right",
@@ -562,7 +562,7 @@ window.CAD_DATA = {
             1336.6
           ]
         ],
-        "h": 3400
+        "h": 3700
       },
       {
         "id": "f1_front_glass",

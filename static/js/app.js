@@ -1389,8 +1389,8 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     kitchenTileWall.receiveShadow = true;
     dGroup.add(kitchenTileWall);
 
-    // Upper section (y: 2040mm ~ ceiling): Smooth warm cream paint (as seen above the tile line in Photo 3!)
-    const creamWallH = Math.max(200, floorHeight - 60 - tileWallH);
+    // Upper section (y: 2040mm ~ 3700mm ceiling): Smooth warm cream paint (as seen above the tile line in Photo 3!)
+    const creamWallH = Math.max(200, floorHeight - tileWallH);
     const creamPaintMat = new THREE.MeshStandardMaterial({
       color: 0xede4d0,
       roughness: 0.88,
@@ -1724,9 +1724,9 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(facadeGroup);
 
     // ------------------------------------------------------------------------
-    // 6) 7 FLUTED ROUND WALL SCONCES ON LEFT WALL (60% HEIGHT, FROM ENTRANCE TO END OF BUILDING)
+    // 6) 7 FLUTED ROUND WALL SCONCES ON LEFT WALL (50% HEIGHT = 10% LOWERED FROM 60%)
     // ------------------------------------------------------------------------
-    const sconceY = floorHeight * 0.60; // 60% height from bottom (2100mm)
+    const sconceY = floorHeight * 0.50; // 50% height from bottom (1850mm, lowered 10% from 60%)
     const leftWallSconceX = [20400, 17200, 14000, 10800, 7600, 4400, 1200];
     const slopeAngle = -Math.atan2(4241.4 - 3707.6, 9558.6 - -339.3);
 
@@ -1742,9 +1742,9 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     });
 
     // ------------------------------------------------------------------------
-    // 7) 4 TILTED WIDE WOODEN-FRAMED MIRRORS RIGHT ABOVE LEFT WALL SCONCES
+    // 7) 4 TILTED WIDE WOODEN-FRAMED MIRRORS RIGHT ABOVE LEFT WALL SCONCES (5% LOWERED)
     // ------------------------------------------------------------------------
-    const mirrorY = sconceY + 620; // Centered at 2840mm (spanning 2500mm ~ 3180mm, directly above the 2220mm wall sconces)
+    const mirrorY = floorHeight * 0.55 + 620; // Lowered 5% of floor height (2840mm -> 2655mm, spanning 2315mm ~ 2995mm above the 1850mm sconces)
     const leftWallMirrorX = [19600, 14000, 7600, 2000];
 
     leftWallMirrorX.forEach((mx) => {
