@@ -69,6 +69,9 @@ function loadArchitecturalTextures() {
   // Clean Architectural Matte White Paint Wall Texture
   const wallWhitePaintTex = loadPbr('./static/textures/wall_white_paint.jpg', 1, 1);
 
+  // Natural Light Oak Wood Grain Texture (Matching user reference photo)
+  const naturalOakTex = loadPbr('./static/textures/wood_natural_oak.jpg', 1, 1);
+
   const timberTex = loadPbr('./static/textures/wood_walnut_grain.jpg', 1, 1);
   const graniteTex = loadPbr('./static/textures/stone_speckled_granite.jpg', 1, 1);
 
@@ -89,6 +92,7 @@ function loadArchitecturalTextures() {
     floorTerrazzoTex,
     wallConcreteTex,
     wallWhitePaintTex,
+    naturalOakTex,
     whiteMosaicTex,
     canopyArtTex,
     facadeConcreteTex,
@@ -199,13 +203,15 @@ const antiqueBronzeMat = new THREE.MeshPhysicalMaterial({
   clearcoat: 0.2,
 });
 
-// PANTONE 4975C RED INFERNO (HEX #4E0000 / RGB 79, 0, 5) Deep Burgundy 2-Tier Bar Countertop Material
+// Natural Light Oak Wood 2-Tier Bar Countertop Material (Matching user reference photo)
 const terracottaCounterMat = new THREE.MeshPhysicalMaterial({
-  color: 0x4e0000,
-  emissive: 0x140001,
-  roughness: 0.34,
-  metalness: 0.02,
-  clearcoat: 0.18,
+  map: PBR_TEX.naturalOakTex,
+  bumpMap: PBR_TEX.naturalOakTex,
+  bumpScale: 0.35,
+  color: 0xffffff,
+  roughness: 0.36,
+  metalness: 0.0,
+  clearcoat: 0.24,
   clearcoatRoughness: 0.28,
 });
 
@@ -1686,14 +1692,16 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     mosaicBaseL.castShadow = true;
     mosaicBaseL.receiveShadow = true;
 
-    // Lower Terracotta Dining Countertop (overhanging toward stools with thick 85mm fascia)
+    // Lower Natural Oak Dining Countertop (overhanging toward stools with thick 85mm fascia)
     const terraTopL = new THREE.Mesh(new RoundedBoxGeometry(5240, 85, 580, 2, 6), terracottaCounterMat);
+    applyBoxUV(terraTopL.geometry, 1400, 600);
     terraTopL.position.set(11770, 912, 2920);
     terraTopL.castShadow = true;
     terraTopL.receiveShadow = true;
 
-    // Upper Terracotta Raised Service Step/Riser (Photo 3 2-tier terracotta counter!)
+    // Upper Natural Oak Raised Service Step/Riser (2-tier bar counter)
     const terraRiserL = new THREE.Mesh(new RoundedBoxGeometry(5240, 165, 250, 2, 6), terracottaCounterMat);
+    applyBoxUV(terraRiserL.geometry, 1400, 600);
     terraRiserL.position.set(11770, 1030, 2705);
     terraRiserL.castShadow = true;
     terraRiserL.receiveShadow = true;
@@ -1707,11 +1715,13 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     mosaicBaseR.receiveShadow = true;
 
     const terraTopR = new THREE.Mesh(new RoundedBoxGeometry(2840, 85, 580, 2, 6), terracottaCounterMat);
+    applyBoxUV(terraTopR.geometry, 1400, 600);
     terraTopR.position.set(16705, 912, 2920);
     terraTopR.castShadow = true;
     terraTopR.receiveShadow = true;
 
     const terraRiserR = new THREE.Mesh(new RoundedBoxGeometry(2840, 165, 250, 2, 6), terracottaCounterMat);
+    applyBoxUV(terraRiserR.geometry, 1400, 600);
     terraRiserR.position.set(16705, 1030, 2705);
     terraRiserR.castShadow = true;
     terraRiserR.receiveShadow = true;
@@ -1725,11 +1735,13 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     mosaicBaseSide.receiveShadow = true;
 
     const terraTopSide = new THREE.Mesh(new RoundedBoxGeometry(540, 85, 2500, 2, 6), terracottaCounterMat);
+    applyBoxUV(terraTopSide.geometry, 600, 1400);
     terraTopSide.position.set(17950, 912, 1780);
     terraTopSide.castShadow = true;
     terraTopSide.receiveShadow = true;
 
     const terraRiserSide = new THREE.Mesh(new RoundedBoxGeometry(250, 165, 2400, 2, 6), terracottaCounterMat);
+    applyBoxUV(terraRiserSide.geometry, 600, 1400);
     terraRiserSide.position.set(17805, 1030, 1730);
     terraRiserSide.castShadow = true;
     terraRiserSide.receiveShadow = true;
@@ -2353,7 +2365,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Perspective matching Photo 3 (looking along the L-shaped terracotta bar & illustrated canopy!)
       camera.position.set(18750, 1620, 3550);
       controls.target.set(11800, 1500, 2150);
-      banner.textContent = '🍷 1F 오픈키친 바 시점: 시원하게 개방된 높은 층고의 오픈키친 + 2단 버건디 바 카운터 + 주방 타일 벽면';
+      banner.textContent = '🍷 1F 오픈키친 바 시점: 시원하게 개방된 높은 층고의 오픈키친 + 2단 내추럴 오크 바 카운터 + 주방 타일 벽면';
     } else if (preset === 'f1_dj') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
