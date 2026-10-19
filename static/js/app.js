@@ -1019,8 +1019,8 @@ function buildStaircase(totalRise, isFloor3 = false) {
   };
 
   if (isFloor3) {
+    // 3층은 최상층이므로 위로 올라가는 계단(y > 0)은 없고, 2층에서 3층 바닥으로 올라오는 계단과 난간만 존재
     buildFlightSet(-totalRise, totalRise);
-    buildFlightSet(0, totalRise);
 
     const centerRail = new THREE.Mesh(new THREE.BoxGeometry(80, 1000, 1850), glassRailMat);
     centerRail.position.set(740, 500, 1750);
@@ -1768,17 +1768,6 @@ function buildModel() {
     // Add Photo 2 & Photo 3 Open Kitchen / Bar / Wall Sconce Signature Details
     const interiorDetails = buildInteriorSignatureDetails(fNum, fData.height);
     fixGroup.add(interiorDetails);
-
-    if (fNum === 3) {
-      const rightStairGroup = new THREE.Group();
-      const sMat = new THREE.MeshStandardMaterial({ map: PBR_TEX.timberTex, color: 0x6e4730, roughness: 0.5 });
-      for (let k = 0; k < 7; k++) {
-        const step = new THREE.Mesh(new THREE.BoxGeometry(660, 180, 250), sMat);
-        step.position.set(10370, (k + 0.5) * 180, 1550 + k * 250);
-        rightStairGroup.add(step);
-      }
-      fixGroup.add(rightStairGroup);
-    }
 
     fData.labels.forEach((lbl) => {
       const el = document.createElement('div');
