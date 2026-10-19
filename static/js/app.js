@@ -22,14 +22,11 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.90;
+renderer.toneMappingExposure = 0.85;
 container.appendChild(renderer.domElement);
 
-// Realistic Image-Based Lighting (IBL) Environment
-const pmremGenerator = new THREE.PMREMGenerator(renderer);
-pmremGenerator.compileEquirectangularShader();
-const roomEnv = new RoomEnvironment();
-scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
+// Studio environment light disabled so only installed interior lights illuminate the store
+scene.environment = null;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -240,9 +237,9 @@ const whitePorcelainMat = new THREE.MeshPhysicalMaterial({
 // Photo 3: Warm Diffused Light Box Canopy Bottom Panel
 const canopyDiffuserMat = new THREE.MeshStandardMaterial({
   color: 0xfff5dc,
-  emissive: 0xffc45c,
-  emissiveIntensity: 1.15,
-  roughness: 0.3,
+  emissive: 0xffc864,
+  emissiveIntensity: 1.35,
+  roughness: 0.25,
 });
 
 // Photo 3: Illustrated Folk Art Canopy Side Banner Material
@@ -251,8 +248,8 @@ const canopyArtSideMat = new THREE.MeshStandardMaterial({
   color: 0xfff8ed,
   emissive: 0xffd28a,
   emissiveMap: PBR_TEX.canopyArtTex,
-  emissiveIntensity: 0.38,
-  roughness: 0.55,
+  emissiveIntensity: 0.55,
+  roughness: 0.5,
 });
 
 const warmLampGlowMat = new THREE.MeshStandardMaterial({
@@ -299,29 +296,16 @@ const contactShadowMat = new THREE.MeshBasicMaterial({
 });
 
 // ============================================================================
-// NATURAL WARM ARCHITECTURAL LIGHTING (No neon color shifting)
+// GENERAL STORE LIGHTS TURNED OFF (Only installed fixture lights active)
 // ============================================================================
-const ambientLight = new THREE.AmbientLight(0xfff4e6, 0.52);
+const ambientLight = new THREE.AmbientLight(0xffe8cc, 0.06);
 scene.add(ambientLight);
 
-const dirLight = new THREE.DirectionalLight(0xfffaf0, 0.65);
+const dirLight = new THREE.DirectionalLight(0xfffaf0, 0.0);
 dirLight.position.set(18000, 28000, 20000);
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 4096;
-dirLight.shadow.mapSize.height = 4096;
-dirLight.shadow.camera.near = 1000;
-dirLight.shadow.camera.far = 65000;
-const dCam = 22000;
-dirLight.shadow.camera.left = -dCam;
-dirLight.shadow.camera.right = dCam;
-dirLight.shadow.camera.top = dCam;
-dirLight.shadow.camera.bottom = -dCam;
-dirLight.shadow.bias = -0.0003;
-dirLight.shadow.normalBias = 0.035;
-dirLight.shadow.radius = 3.0;
 scene.add(dirLight);
 
-const fillLight = new THREE.DirectionalLight(0xffe4c4, 0.28);
+const fillLight = new THREE.DirectionalLight(0xffe4c4, 0.0);
 fillLight.position.set(-12000, 15000, -14000);
 scene.add(fillLight);
 
@@ -1050,8 +1034,10 @@ function buildStaircase(totalRise, isFloor3 = false) {
 // ============================================================================
 // PHOTO 3: SUSPENDED ILLUSTRATED LIGHT BOX CANOPY HOOD BUILDER
 // ============================================================================
-function createIllustratedLightBoxCanopy(xCenter, zCenter, width, depth, bottomY, height, ceilingY) {
+function createIllustratedLightBoxCanopy(xCenter, zCenter, width, depth, bottomY, height, ceilingY, rotY = 0) {
   const canopyGroup = new THREE.Group();
+  canopyGroup.position.set(xCenter, 0, zCenter);
+  canopyGroup.rotation.y = rotY;
 
   // 4 Vertical Illustrated Banner Sides + Dark Top Cap + Glowing Diffuser Bottom Panel
   // Material array for BoxGeometry: [+X right, -X left, +Y top, -Y bottom, +Z front, -Z back]
@@ -1065,43 +1051,43 @@ function createIllustratedLightBoxCanopy(xCenter, zCenter, width, depth, bottomY
   ];
   const boxGeom = new THREE.BoxGeometry(width, height, depth);
   const canopyMesh = new THREE.Mesh(boxGeom, boxMats);
-  canopyMesh.position.set(xCenter, bottomY + height / 2, zCenter);
+  canopyMesh.position.set(0, bottomY + height / 2, 0);
   canopyMesh.castShadow = true;
   canopyGroup.add(canopyMesh);
 
   // Subtle dark trim border around bottom diffuser edge (as seen in Photo 3!)
-  const trimThick = 14;
+  const trimThick = 12;
   const frontTrim = new THREE.Mesh(new THREE.BoxGeometry(width + 6, trimThick, trimThick), darkMetalMat);
-  frontTrim.position.set(xCenter, bottomY + trimThick / 2, zCenter + depth / 2);
+  frontTrim.position.set(0, bottomY + trimThick / 2, depth / 2);
   const backTrim = new THREE.Mesh(new THREE.BoxGeometry(width + 6, trimThick, trimThick), darkMetalMat);
-  backTrim.position.set(xCenter, bottomY + trimThick / 2, zCenter - depth / 2);
+  backTrim.position.set(0, bottomY + trimThick / 2, -depth / 2);
   const leftTrim = new THREE.Mesh(new THREE.BoxGeometry(trimThick, trimThick, depth + 6), darkMetalMat);
-  leftTrim.position.set(xCenter - width / 2, bottomY + trimThick / 2, zCenter);
+  leftTrim.position.set(-width / 2, bottomY + trimThick / 2, 0);
   const rightTrim = new THREE.Mesh(new THREE.BoxGeometry(trimThick, trimThick, depth + 6), darkMetalMat);
-  rightTrim.position.set(xCenter + width / 2, bottomY + trimThick / 2, zCenter);
+  rightTrim.position.set(width / 2, bottomY + trimThick / 2, 0);
   canopyGroup.add(frontTrim, backTrim, leftTrim, rightTrim);
 
   // Black vertical suspension rods hanging from ceiling to top of light box (Photo 3!)
   const rodH = Math.max(200, ceilingY - (bottomY + height));
   const rodY = bottomY + height + rodH / 2;
   const rodOffsets = [
-    [-width * 0.42, -depth * 0.42],
-    [width * 0.42, -depth * 0.42],
-    [-width * 0.42, depth * 0.42],
-    [width * 0.42, depth * 0.42],
-    [0, depth * 0.42],
+    [-width * 0.42, -depth * 0.38],
+    [width * 0.42, -depth * 0.38],
+    [-width * 0.42, depth * 0.38],
+    [width * 0.42, depth * 0.38],
+    [0, depth * 0.38],
   ];
   rodOffsets.forEach(([rx, rz]) => {
-    const rod = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, rodH, 10), darkMetalMat);
-    rod.position.set(xCenter + rx, rodY, zCenter + rz);
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, rodH, 10), darkMetalMat);
+    rod.position.set(rx, rodY, rz);
     canopyGroup.add(rod);
   });
 
-  // Warm downward illumination from the light box onto the terracotta counter & stainless kitchen
-  const lightLeft = new THREE.PointLight(0xffcf78, 2.2, 5200);
-  lightLeft.position.set(xCenter - width * 0.25, bottomY - 60, zCenter);
-  const lightRight = new THREE.PointLight(0xffcf78, 2.2, 5200);
-  lightRight.position.set(xCenter + width * 0.25, bottomY - 60, zCenter);
+  // Warm downward illumination from the light box onto the burgundy bar counter & open kitchen
+  const lightLeft = new THREE.PointLight(0xffcf78, 2.4, 4600, 1.45);
+  lightLeft.position.set(-width * 0.25, bottomY - 50, 0);
+  const lightRight = new THREE.PointLight(0xffcf78, 2.4, 4600, 1.45);
+  lightRight.position.set(width * 0.25, bottomY - 50, 0);
   canopyGroup.add(lightLeft, lightRight);
 
   return canopyGroup;
@@ -1147,7 +1133,7 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     dGroup.add(exhaustHood);
 
     // Warm under-hood task light illuminating the cooking line (Photo 3 left background)
-    const hoodLight = new THREE.PointLight(0xffe0a3, 1.5, 3600);
+    const hoodLight = new THREE.PointLight(0xffe0a3, 1.4, 3200, 1.5);
     hoodLight.position.set(10650, 1920, 950);
     dGroup.add(hoodLight);
 
@@ -1192,12 +1178,12 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     });
 
     // ------------------------------------------------------------------------
-    // 3) PHOTO 3: TWO SUSPENDED ILLUSTRATED LIGHT BOX CANOPY HOODS OVER 1F BAR COUNTER
+    // 3) PHOTO 3: TWO SUSPENDED ILLUSTRATED LIGHT BOX CANOPY HOODS (50% SLIMMER & ALIGNED DIRECTLY OVER BAR TABLE)
     // ------------------------------------------------------------------------
-    // Rear-left canopy over main bar section (x: 9200 ~ 14350)
-    const canopyLeft = createIllustratedLightBoxCanopy(11775, 2520, 5150, 920, 2120, 460, floorHeight - 60);
-    // Front-right L-shaped canopy over right bar & cocktail station (x: 15150 ~ 18150)
-    const canopyRight = createIllustratedLightBoxCanopy(16680, 2520, 2980, 960, 2120, 460, floorHeight - 60);
+    // Rear-left canopy: directly centered above Left Bar Table (x: 9190 ~ 14350, zCenter: 2885, depth: 460mm = 50% reduced, height: 260mm)
+    const canopyLeft = createIllustratedLightBoxCanopy(11770, 2885, 5200, 460, 2160, 260, floorHeight - 150, 0);
+    // Front-right canopy: directly centered above Right Bar Table (x: 15330 ~ 18140, zCenter: 2885, depth: 460mm = 50% reduced, height: 260mm)
+    const canopyRight = createIllustratedLightBoxCanopy(16735, 2885, 2810, 460, 2160, 260, floorHeight - 150, 0);
     dGroup.add(canopyLeft, canopyRight);
 
     // ------------------------------------------------------------------------
@@ -1347,17 +1333,23 @@ function buildModel() {
     slabMesh.userData = { isSlab: true, floor: fNum };
     fGroup.add(slabMesh);
 
-    // 1-B. Interior Ceiling Slab (Warm industrial matte ceiling)
+    // 1-B. Interior Ceiling Slab (Dark matte ceiling positioned at height - 155 so upper floor terrazzo never shows on ceiling)
     const ceilingMat = new THREE.MeshStandardMaterial({
-      color: 0x6e6259,
-      roughness: 0.85,
+      color: 0x1c1917,
+      roughness: 0.92,
       side: THREE.DoubleSide,
     });
-    const ceilingMesh = createSlabMesh(fData.slab_polygon, fData.slab_hole, 60, ceilingMat);
-    ceilingMesh.position.y = fData.height - 60;
+    const ceilingMesh = createSlabMesh(fData.slab_polygon, fData.slab_hole, 30, ceilingMat);
+    ceilingMesh.position.y = fData.height - 155;
     ceilingMesh.visible = false;
     fGroup.add(ceilingMesh);
     ceilingMeshes.push(ceilingMesh);
+    if (fNum > 1) {
+      // Underside cap of upper floor slab so even in 'all' view looking up shows a dark ceiling instead of terrazzo
+      const underCap = createSlabMesh(fData.slab_polygon, fData.slab_hole, 8, ceilingMat);
+      underCap.position.y = -156;
+      fGroup.add(underCap);
+    }
 
     // 2. CAD Floor Plan Image Overlay (Hidden by default)
     const b = fData.texture_bounds_mm;
