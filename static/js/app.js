@@ -1112,48 +1112,29 @@ function createIllustratedLightBoxCanopy(xCenter, zCenter, width, depth, bottomY
 function buildInteriorSignatureDetails(fNum, floorHeight) {
   const dGroup = new THREE.Group();
 
-  // Photo 2: Burgundy-Brown Perforated Ceiling Cable Tray & Directional Track Spotlights
-  const createCeilingTrayAndTrack = (xCenter, zPos, length) => {
-    const trayGroup = new THREE.Group();
-    // Perforated cable tray ladder
-    const sideRail1 = new THREE.Mesh(new THREE.BoxGeometry(length, 42, 16), burgundyMetalMat);
-    sideRail1.position.set(xCenter, floorHeight - 170, zPos - 140);
-    const sideRail2 = new THREE.Mesh(new THREE.BoxGeometry(length, 42, 16), burgundyMetalMat);
-    sideRail2.position.set(xCenter, floorHeight - 170, zPos + 140);
-    trayGroup.add(sideRail1, sideRail2);
-
-    const numRungs = Math.floor(length / 320);
-    for (let r = 0; r < numRungs; r++) {
-      const rx = xCenter - length / 2 + (r + 0.5) * 320;
-      const rung = new THREE.Mesh(new THREE.BoxGeometry(85, 10, 280), burgundyMetalMat);
-      rung.position.set(rx, floorHeight - 186, zPos);
-      trayGroup.add(rung);
-    }
-
-    // Track spotlight rail mounted alongside cable tray (Photo 2 top left)
-    const trackBar = new THREE.Mesh(new THREE.BoxGeometry(length, 22, 26), burgundyMetalMat);
-    trackBar.position.set(xCenter, floorHeight - 205, zPos + 210);
-    trayGroup.add(trackBar);
-
-    for (let sx = xCenter - length * 0.44; sx <= xCenter + length * 0.44; sx += 1550) {
-      const can = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 155, 16), burgundyMetalMat);
-      can.position.set(sx, floorHeight - 285, zPos + 210);
-      const lens = new THREE.Mesh(new THREE.CylinderGeometry(20, 20, 6, 16), warmLampGlowMat);
-      lens.position.set(sx, floorHeight - 362, zPos + 210);
-      trayGroup.add(can, lens);
-    }
-    return trayGroup;
-  };
-
   if (fNum === 1) {
     // ------------------------------------------------------------------------
-    // 1) PHOTO 3: OPEN KITCHEN WHITE SQUARE MOSAIC TILE BACK WALL (BẾP ~ PHA CHẾ)
+    // 1) PHOTO 3: OPEN KITCHEN BACK WALL (LOWER WHITE MOSAIC TILE + UPPER CREAM PAINT)
     // ------------------------------------------------------------------------
-    const kitchenTileWall = new THREE.Mesh(new THREE.BoxGeometry(9250, floorHeight - 120, 28), whiteMosaicTileMat);
+    // Lower section (y: 0 ~ 2040mm, up to the red line just above the shelf bowls): White square mosaic tile
+    const tileWallH = 2040;
+    const kitchenTileWall = new THREE.Mesh(new THREE.BoxGeometry(9250, tileWallH, 28), whiteMosaicTileMat);
     applyBoxUV(kitchenTileWall.geometry, 480, 480);
-    kitchenTileWall.position.set(13600, (floorHeight - 120) / 2, 550);
+    kitchenTileWall.position.set(13600, tileWallH / 2, 550);
     kitchenTileWall.receiveShadow = true;
     dGroup.add(kitchenTileWall);
+
+    // Upper section (y: 2040mm ~ ceiling): Smooth warm cream paint (as seen above the tile line in Photo 3!)
+    const creamWallH = Math.max(200, floorHeight - 60 - tileWallH);
+    const creamPaintMat = new THREE.MeshStandardMaterial({
+      color: 0xede4d0,
+      roughness: 0.88,
+      metalness: 0.01,
+    });
+    const kitchenCreamUpperWall = new THREE.Mesh(new THREE.BoxGeometry(9250, creamWallH, 28), creamPaintMat);
+    kitchenCreamUpperWall.position.set(13600, tileWallH + creamWallH / 2, 550);
+    kitchenCreamUpperWall.receiveShadow = true;
+    dGroup.add(kitchenCreamUpperWall);
 
     // ------------------------------------------------------------------------
     // 2) PHOTO 3: WALL-MOUNTED STAINLESS STEEL OPEN SHELVES + STACKED CERAMIC BOWLS, PLATES & POTS
@@ -1285,20 +1266,6 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     terraRiserSide.castShadow = true;
     terraRiserSide.receiveShadow = true;
     dGroup.add(mosaicBaseSide, terraTopSide, terraRiserSide);
-
-    // ------------------------------------------------------------------------
-    // 5) PHOTO 2: ANTIQUE BRONZE BELL WALL SCONCES ALONG RAW CONCRETE WALLS & DINING HALL
-    // ------------------------------------------------------------------------
-    // Mounted along south concrete corridor wall (z=4180, facing -Z) & north dining hall wall (x=19600, 21400, z=560, facing +Z)
-    [10200, 13200, 16200, 19500].forEach((sx) => {
-      dGroup.add(createIndustrialWallSconce(sx, 4170, -1));
-    });
-    [19400, 21200].forEach((sx) => {
-      dGroup.add(createIndustrialWallSconce(sx, 550, 1));
-    });
-
-    // Ceiling Burgundy-Brown Perforated Cable Tray & Track Lights (Photo 2)
-    dGroup.add(createCeilingTrayAndTrack(15500, 3650, 14000));
   } else if (fNum === 2) {
     // ------------------------------------------------------------------------
     // 2F SEMI-CIRCULAR CRAFT BEER BAR (QUẦY LẤY BIA) IN MATCHING WHITE MOSAIC + TERRACOTTA STYLE
@@ -1347,17 +1314,6 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     const tapBridge = new THREE.Mesh(new RoundedBoxGeometry(950, 420, 120, 3, 14), stainlessMat);
     tapBridge.position.set(12850, 1150, 1050);
     dGroup.add(barMosaicBase, barTerraTop, barTerraRiser, tapBridge);
-
-    // Photo 2 Antique Bronze Bell Wall Sconces along 2F Raw Concrete Walls
-    [10400, 15300, 18200, 21800].forEach((sx) => {
-      dGroup.add(createIndustrialWallSconce(sx, 540, 1));
-    });
-    [9800, 13500, 18200, 21800].forEach((sx) => {
-      dGroup.add(createIndustrialWallSconce(sx, 4170, -1));
-    });
-
-    // 2F Ceiling Burgundy-Brown Perforated Cable Tray & Track Lights
-    dGroup.add(createCeilingTrayAndTrack(14500, 2350, 16000));
   }
 
   return dGroup;
