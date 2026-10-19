@@ -560,48 +560,149 @@ function createCafeDiningChair(x, z, facingAngle = 0) {
 }
 
 // ============================================================================
-// PHOTO 2: ANTIQUE BRONZE BELL WALL SCONCE ON VERTICAL BLACK METAL POLE
+// FLUTED ROUND WARM WALL SCONCE (Horizontally Ribbed Golden Diffuser Lens + Warm Halo)
 // ============================================================================
-function createIndustrialWallSconce(x, z, facingNormalZ = 1) {
+const flutedSconceTextures = (() => {
+  // 1) Fluted front lens texture (warm golden core + horizontal ribbed shading)
+  const lCanvas = document.createElement('canvas');
+  lCanvas.width = 256;
+  lCanvas.height = 256;
+  const lCtx = lCanvas.getContext('2d');
+
+  const radGrad = lCtx.createRadialGradient(128, 128, 12, 128, 128, 128);
+  radGrad.addColorStop(0, '#fffdf5');
+  radGrad.addColorStop(0.45, '#ffd27d');
+  radGrad.addColorStop(0.82, '#d98a2b');
+  radGrad.addColorStop(1, '#7a4312');
+  lCtx.fillStyle = radGrad;
+  lCtx.fillRect(0, 0, 256, 256);
+
+  // Horizontal wave ribs across the circular face
+  const numRibs = 15;
+  const ribH = 256 / numRibs;
+  for (let i = 0; i < numRibs; i++) {
+    const y0 = i * ribH;
+    const g = lCtx.createLinearGradient(0, y0, 0, y0 + ribH);
+    g.addColorStop(0.0, 'rgba(55, 25, 5, 0.55)');
+    g.addColorStop(0.28, 'rgba(255, 240, 200, 0.35)');
+    g.addColorStop(0.5, 'rgba(255, 250, 230, 0.55)');
+    g.addColorStop(0.75, 'rgba(180, 105, 25, 0.25)');
+    g.addColorStop(1.0, 'rgba(55, 25, 5, 0.55)');
+    lCtx.fillStyle = g;
+    lCtx.fillRect(0, y0, 256, ribH);
+  }
+  const lensTex = new THREE.CanvasTexture(lCanvas);
+  lensTex.colorSpace = THREE.SRGBColorSpace;
+
+  // 2) Soft warm wall halo glow texture around the sconce base
+  const hCanvas = document.createElement('canvas');
+  hCanvas.width = 256;
+  hCanvas.height = 256;
+  const hCtx = hCanvas.getContext('2d');
+  const hGrad = hCtx.createRadialGradient(128, 128, 28, 128, 128, 128);
+  hGrad.addColorStop(0, 'rgba(255, 195, 95, 0.65)');
+  hGrad.addColorStop(0.4, 'rgba(255, 165, 60, 0.28)');
+  hGrad.addColorStop(0.75, 'rgba(255, 140, 40, 0.08)');
+  hGrad.addColorStop(1, 'rgba(255, 130, 30, 0)');
+  hCtx.fillStyle = hGrad;
+  hCtx.fillRect(0, 0, 256, 256);
+  const haloTex = new THREE.CanvasTexture(hCanvas);
+  haloTex.colorSpace = THREE.SRGBColorSpace;
+
+  return { lensTex, haloTex };
+})();
+
+const sconceBodyBrassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xd8b57c,
+  emissive: 0x4a2e0b,
+  emissiveIntensity: 0.35,
+  roughness: 0.28,
+  metalness: 0.72,
+  clearcoat: 0.3,
+});
+
+const sconceFlutedLensMat = new THREE.MeshStandardMaterial({
+  map: flutedSconceTextures.lensTex,
+  emissiveMap: flutedSconceTextures.lensTex,
+  emissive: 0xffb84d,
+  emissiveIntensity: 1.55,
+  roughness: 0.18,
+  metalness: 0.1,
+});
+
+const sconceRibGlassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffdfa8,
+  emissive: 0xffa733,
+  emissiveIntensity: 0.85,
+  roughness: 0.15,
+  metalness: 0.15,
+  transmission: 0.55,
+  transparent: true,
+  opacity: 0.92,
+  clearcoat: 0.85,
+});
+
+const sconceWallHaloMat = new THREE.MeshBasicMaterial({
+  map: flutedSconceTextures.haloTex,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+
+function createFlutedRoundWallSconce(x, y, z, rotY = 0) {
   const g = new THREE.Group();
-  // Vertical black metal pipe pole rising from floor (y=0 to y=1850)
-  const poleH = 1850;
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, poleH, 12), darkMetalMat);
-  pole.position.set(0, poleH / 2, 24 * facingNormalZ);
-  g.add(pole);
+  g.position.set(x, y, z);
+  g.rotation.y = rotY;
 
-  // Wall mounting bracket clamps along the vertical pole (as seen in Photo 2!)
-  [650, 1320, 1780].forEach((cy) => {
-    const clamp = new THREE.Mesh(new THREE.BoxGeometry(28, 24, 38), darkMetalMat);
-    clamp.position.set(0, cy, 14 * facingNormalZ);
-    g.add(clamp);
-  });
+  const radius = 135;
+  const depth = 105;
 
-  // Top U-shaped curved gooseneck arm extending forward
-  const armTop = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 120, 12), darkMetalMat);
-  armTop.rotation.x = Math.PI / 2;
-  armTop.position.set(0, poleH, 75 * facingNormalZ);
-  g.add(armTop);
+  // Soft warm halo glow projected onto the wall right behind the fixture
+  const haloPlane = new THREE.Mesh(new THREE.PlaneGeometry(620, 620), sconceWallHaloMat);
+  haloPlane.position.set(0, 0, -6);
+  haloPlane.rotation.y = Math.PI;
+  g.add(haloPlane);
 
-  // Antique Brass/Bronze Bell Shade hanging down from arm
-  const shadeZ = 130 * facingNormalZ;
-  const bellCap = new THREE.Mesh(new THREE.SphereGeometry(68, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), antiqueBronzeMat);
-  bellCap.position.set(0, poleH - 35, shadeZ);
-  const bellBody = new THREE.Mesh(new THREE.CylinderGeometry(68, 76, 135, 24), antiqueBronzeMat);
-  bellBody.position.set(0, poleH - 102, shadeZ);
-  bellBody.castShadow = true;
+  // Dark bronze rear mounting ring flush with the wall
+  const backRing = new THREE.Mesh(new THREE.CylinderGeometry(radius + 8, radius + 8, 14, 36), antiqueBronzeMat);
+  backRing.rotation.x = Math.PI / 2;
+  backRing.position.set(0, 0, -7);
+  g.add(backRing);
 
-  // Glowing warm bulb diffuser inside bottom of bell shade
-  const bulbLens = new THREE.Mesh(new THREE.CylinderGeometry(66, 66, 8, 24), warmLampGlowMat);
-  bulbLens.position.set(0, poleH - 168, shadeZ);
-  g.add(bellCap, bellBody, bulbLens);
+  // Warm satin brass cylindrical side housing
+  const bodyCyl = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius + 4, depth, 40), sconceBodyBrassMat);
+  bodyCyl.rotation.x = Math.PI / 2;
+  bodyCyl.position.set(0, 0, -depth / 2);
+  bodyCyl.castShadow = true;
+  g.add(bodyCyl);
 
-  // Subtle warm point light casting cone glow onto the raw concrete wall (just like Photo 2!)
-  const sconceLight = new THREE.PointLight(0xffe0b2, 1.15, 2800);
-  sconceLight.position.set(0, poleH - 210, (shadeZ + 40 * facingNormalZ));
+  // Glowing inner diffuser disc at the front face
+  const lensR = radius - 7;
+  const frontDisc = new THREE.Mesh(new THREE.CylinderGeometry(lensR, lensR, 10, 40), sconceFlutedLensMat);
+  frontDisc.rotation.x = Math.PI / 2;
+  frontDisc.position.set(0, 0, -depth - 2);
+  g.add(frontDisc);
+
+  // 3D Horizontal Fluted / Ribbed Glass Waves across the circular front face (matching photo!)
+  const numRibs = 15;
+  const stepY = (lensR * 2) / numRibs;
+  const ribRadius = stepY * 0.52;
+  for (let i = 0; i < numRibs; i++) {
+    const dy = -lensR + (i + 0.5) * stepY;
+    const halfChord = Math.sqrt(Math.max(0, lensR * lensR - dy * dy));
+    if (halfChord < 12) continue;
+    const ribGeom = new THREE.CylinderGeometry(ribRadius, ribRadius, halfChord * 2, 16);
+    ribGeom.rotateZ(Math.PI / 2);
+    const ribMesh = new THREE.Mesh(ribGeom, sconceRibGlassMat);
+    ribMesh.position.set(0, dy, -depth - 4);
+    g.add(ribMesh);
+  }
+
+  // Warm golden point light illuminating the wall & corridor floor
+  const sconceLight = new THREE.PointLight(0xffbe5c, 0.75, 4200, 0);
+  sconceLight.position.set(0, 0, -depth - 140);
   g.add(sconceLight);
 
-  g.position.set(x, 0, z);
   return g;
 }
 
@@ -1451,6 +1552,24 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     facadeGroup.add(facadeStreetLight);
 
     dGroup.add(facadeGroup);
+
+    // ------------------------------------------------------------------------
+    // 6) 7 FLUTED ROUND WALL SCONCES ON LEFT WALL (60% HEIGHT, FROM ENTRANCE TO END OF BUILDING)
+    // ------------------------------------------------------------------------
+    const sconceY = floorHeight * 0.60; // 60% height from bottom (2100mm)
+    const leftWallSconceX = [20400, 17200, 14000, 10800, 7600, 4400, 1200];
+    const slopeAngle = -Math.atan2(4241.4 - 3707.6, 9558.6 - -339.3);
+
+    leftWallSconceX.forEach((sx) => {
+      let sz = 4241.4;
+      let sRotY = 0;
+      if (sx < 9558.6) {
+        const t = (sx - -339.3) / (9558.6 - -339.3);
+        sz = 3707.6 + t * (4241.4 - 3707.6);
+        sRotY = slopeAngle;
+      }
+      dGroup.add(createFlutedRoundWallSconce(sx, sconceY, sz, sRotY));
+    });
   } else if (fNum === 2) {
     // ------------------------------------------------------------------------
     // 2F SEMI-CIRCULAR CRAFT BEER BAR (QUẦY LẤY BIA) IN MATCHING WHITE MOSAIC + TERRACOTTA STYLE
