@@ -1183,13 +1183,15 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     });
 
     // ------------------------------------------------------------------------
-    // 3) PHOTO 3: TWO SUSPENDED ILLUSTRATED LIGHT BOX CANOPY HOODS (50% SLIMMER & ALIGNED DIRECTLY OVER BAR TABLE)
+    // 3) PHOTO 3: SUSPENDED ILLUSTRATED LIGHT BOX CANOPY HOODS (50% SLIMMER & L-SHAPED OVER BAR TABLE)
     // ------------------------------------------------------------------------
     // Rear-left canopy: directly centered above Left Bar Table (x: 9190 ~ 14350, zCenter: 2885, depth: 460mm = 50% reduced, height: 260mm)
     const canopyLeft = createIllustratedLightBoxCanopy(11770, 2885, 5200, 460, 2160, 260, floorHeight - 150, 0);
-    // Front-right canopy: directly centered above Right Bar Table (x: 15330 ~ 18140, zCenter: 2885, depth: 460mm = 50% reduced, height: 260mm)
+    // Front-right canopy: directly centered above Right Front Bar Table (x: 15330 ~ 18140, zCenter: 2885, depth: 460mm, height: 260mm)
     const canopyRight = createIllustratedLightBoxCanopy(16735, 2885, 2810, 460, 2160, 260, floorHeight - 150, 0);
-    dGroup.add(canopyLeft, canopyRight);
+    // L-bent side canopy: directly centered above the L-bent Side Bar Table (xCenter: 17910, z: 550 ~ 2655, depth: 460mm, height: 260mm)
+    const canopySide = createIllustratedLightBoxCanopy(17910, 1602, 2105, 460, 2160, 260, floorHeight - 150, Math.PI / 2);
+    dGroup.add(canopyLeft, canopyRight, canopySide);
 
     // ------------------------------------------------------------------------
     // 4) PHOTO 3: 2-TIER TERRACOTTA / BURNT-SIENNA BAR COUNTER + WHITE MOSAIC TILE BASE
