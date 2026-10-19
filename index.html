@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>173 DE THAM - Kumori Soho 3D 인테리어 완공 뷰어</title>
+  <title>173 DE THAM - 3D 인테리어 완공 뷰어</title>
   <link rel="stylesheet" href="./static/css/app.css" />
   <script type="importmap">
     {
@@ -32,7 +32,7 @@
     </div>
     <div class="camera-presets">
       <button class="cam-btn" data-cam="iso">조감도</button>
-      <button class="cam-btn" data-cam="f1_walk">🔥 1F 바</button>
+      <button class="cam-btn" data-cam="f1_walk">🍷 1F 오픈키친 바</button>
       <button class="cam-btn" data-cam="f1_dj">🎧 1F DJ홀</button>
       <button class="cam-btn" data-cam="f2_beer">🍺 2F 맥주바</button>
       <button class="cam-btn" data-cam="f2_vip">🥂 2F VIP룸</button>
@@ -52,29 +52,16 @@
       <h3>⚙️ 인테리어 설정 & 옵션</h3>
       <button id="btn-close-panel" class="panel-close-btn" title="닫기">✕</button>
     </div>
-    <section class="panel-section">
-      <h3>🌈 Kumori 시간대별 조명 변화 (Time-of-Day)</h3>
-      <label class="toggle-row">
-        <span>시간대별 조명 색상 자동 순환 (Auto Cycle)</span>
-        <input type="checkbox" id="toggle-auto-light" checked />
-      </label>
-      <div class="mood-btn-grid" id="kumori-mood-btns">
-        <button class="mood-btn active" data-mood="sunset">🌅 선셋 오렌지 (초저녁)</button>
-        <button class="mood-btn" data-mood="magenta">💜 네온 마젠타/퍼플 (밤)</button>
-        <button class="mood-btn" data-mood="crimson">❤️ 크림슨 레드 & 블루 (심야)</button>
-        <button class="mood-btn" data-mood="daylight">☀️ 화이트 데이라이트 (낮)</button>
-      </div>
-    </section>
 
     <section class="panel-section">
       <h3>인테리어 마감 & 뷰 제어</h3>
       <label class="toggle-row">
-        <span>실내 화이트 천장 & 타공 트레이 표시</span>
+        <span>실내 천장 & 트랙 조명 표시</span>
         <input type="checkbox" id="toggle-ceiling" />
       </label>
       <div class="slider-row">
         <span>실내 조명 밝기 (Exposure)</span>
-        <input type="range" id="slider-bloom" min="0.35" max="1.35" step="0.05" value="0.85" />
+        <input type="range" id="slider-bloom" min="0.35" max="1.35" step="0.05" value="0.90" />
       </div>
       <label class="toggle-row">
         <span>CAD 도면 바닥선 겹쳐보기 (검수용)</span>
@@ -97,7 +84,7 @@
         <input type="checkbox" id="toggle-labels" />
       </label>
       <label class="toggle-row">
-        <span>가구 / 주방 설비 / 천막 표시</span>
+        <span>가구 / 오픈키친 설비 표시</span>
         <input type="checkbox" id="toggle-fixtures" checked />
       </label>
     </section>
@@ -138,7 +125,7 @@
 
   <!-- Bottom Tooltip / Selection Info -->
   <div id="selection-banner" class="selection-banner">
-    상단 '🔥 1F 핸드롤 바 내부' 또는 '🍺 2F 원형 맥주바 내부' 버튼을 누르거나 원하는 바닥을 더블클릭해 완공된 실사 인테리어 공간을 둘러보세요!
+    상단 '🍷 1F 오픈키친 바' 버튼을 누르거나 원하는 바닥을 더블클릭해 화이트 테라조 바닥·노출 콘크리트 벽·일러스트 라이트박스 오픈키친 공간을 둘러보세요!
   </div>
 
   <!-- Floating Fullscreen UI Toggle Button (Always accessible when UI is hidden) -->
