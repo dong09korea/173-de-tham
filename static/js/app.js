@@ -238,22 +238,40 @@ const whitePorcelainMat = new THREE.MeshPhysicalMaterial({
   clearcoat: 0.85,
 });
 
-// Photo 3: Warm Diffused Light Box Canopy Bottom Panel
-const canopyDiffuserMat = new THREE.MeshStandardMaterial({
-  color: 0xfff5dc,
-  emissive: 0xffc864,
-  emissiveIntensity: 1.35,
-  roughness: 0.25,
+// Glazed Deep Burgundy Bathroom Floor & Wall Tile Material
+const burgundyTileMat = new THREE.MeshPhysicalMaterial({
+  map: PBR_TEX.whiteMosaicTex,
+  bumpMap: PBR_TEX.whiteMosaicTex,
+  bumpScale: 1.1,
+  color: 0x4a0810, // Deep glazed burgundy tile (#4A0810)
+  roughness: 0.24,
+  clearcoat: 0.45,
+  clearcoatRoughness: 0.22,
 });
 
-// Photo 3: Illustrated Folk Art Canopy Side Banner Material
-const canopyArtSideMat = new THREE.MeshStandardMaterial({
-  map: PBR_TEX.canopyArtTex,
-  color: 0xfff8ed,
-  emissive: 0xffd28a,
-  emissiveMap: PBR_TEX.canopyArtTex,
-  emissiveIntensity: 0.55,
-  roughness: 0.5,
+// Linear LED Strip Lighting at 1600mm inside Bathrooms (Warm Glowing Strip)
+const ledStripGlowMat = new THREE.MeshStandardMaterial({
+  color: 0xfff4dc,
+  emissive: 0xffc454,
+  emissiveIntensity: 2.2,
+  roughness: 0.2,
+});
+
+// Warm Diffused Light Box Canopy Bottom Panel
+const canopyDiffuserMat = new THREE.MeshStandardMaterial({
+  color: 0xfffaf0,
+  emissive: 0xffdf9c,
+  emissiveIntensity: 1.35,
+  roughness: 0.24,
+});
+
+// 1F Suspended Warm Cream Architectural Light Box Canopy (Cream Color Canopy)
+const creamCanopyMat = new THREE.MeshStandardMaterial({
+  color: 0xfcf8ee, // Warm creamy architectural canopy finish
+  emissive: 0xffeed2,
+  emissiveIntensity: 0.42,
+  roughness: 0.35,
+  metalness: 0.02,
 });
 
 const warmLampGlowMat = new THREE.MeshStandardMaterial({
@@ -370,6 +388,51 @@ function createCleanWallMesh(poly, height, material, addBaseboard = false) {
   }
 
   return mesh;
+}
+
+// Helper: Extrude a split wall (Lower finish up to splitH, Upper finish from splitH to totalH, with optional trim/LED strip at splitH)
+function createSplitWallMesh(poly, totalH, splitH, lowerMat, upperMat, trimMat = null) {
+  const g = new THREE.Group();
+
+  const shape = new THREE.Shape();
+  poly.forEach((pt, idx) => {
+    if (idx === 0) shape.moveTo(pt[0], -pt[1]);
+    else shape.lineTo(pt[0], -pt[1]);
+  });
+  shape.closePath();
+
+  // 1) Lower Wainscot Section (y: 0 ~ splitH)
+  const lowerGeom = new THREE.ExtrudeGeometry(shape, { depth: splitH, bevelEnabled: false });
+  lowerGeom.rotateX(-Math.PI / 2);
+  lowerGeom.computeVertexNormals();
+  applyBoxUV(lowerGeom, 480, 480);
+  const lowerMesh = new THREE.Mesh(lowerGeom, lowerMat);
+  lowerMesh.castShadow = true;
+  lowerMesh.receiveShadow = true;
+  g.add(lowerMesh);
+
+  // 2) Upper Wall Section (y: splitH ~ totalH)
+  const upperH = Math.max(100, totalH - splitH);
+  const upperGeom = new THREE.ExtrudeGeometry(shape, { depth: upperH, bevelEnabled: false });
+  upperGeom.rotateX(-Math.PI / 2);
+  upperGeom.computeVertexNormals();
+  applyBoxUV(upperGeom, 2400, 2400);
+  const upperMesh = new THREE.Mesh(upperGeom, upperMat);
+  upperMesh.position.y = splitH;
+  upperMesh.castShadow = true;
+  upperMesh.receiveShadow = true;
+  g.add(upperMesh);
+
+  // 3) Trim Molding / LED Strip at y = splitH
+  if (trimMat) {
+    const trimGeom = new THREE.ExtrudeGeometry(shape, { depth: 24, bevelEnabled: false });
+    trimGeom.rotateX(-Math.PI / 2);
+    const trimMesh = new THREE.Mesh(trimGeom, trimMat);
+    trimMesh.position.y = splitH - 12;
+    g.add(trimMesh);
+  }
+
+  return g;
 }
 
 function createSlabMesh(poly, holePoly, thickness, material) {
@@ -1185,26 +1248,138 @@ function buildArchitecturalDoorsAndToilets(fNum) {
     const leaf = new THREE.Mesh(new THREE.BoxGeometry(width, 2100, 45), doorWoodMat);
     leaf.position.set(width / 2, 1050, 0);
     leaf.castShadow = true;
-    const handle = new THREE.Mesh(new THREE.BoxGeometry(120, 22, 95), stainlessMat);
-    handle.position.set(width - 90, 1000, 0);
-    dg.add(leaf, handle);
+    dg.add(leaf);
+
+    // Double-sided flush metal lever handles (accessible from both inside and outside)
+    [-30, 30].forEach((hz) => {
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(120, 22, 28), stainlessMat);
+      handle.position.set(width - 90, 1000, hz);
+      dg.add(handle);
+    });
 
     dg.position.set(x, 0, z);
     dg.rotation.y = rotY;
     g.add(dg);
   }
 
+  // --------------------------------------------------------------------------
+  // TOILET INTERIOR FINISHES: 160cm BURGUNDY TILE WAINSCOT + LED STRIP + FLOOR
+  // --------------------------------------------------------------------------
   if (fNum === 1) {
-    addToilet(1720, 920, 0);
-    addToilet(3920, 920, 0);
-    addDoor(2050, 2650, 750, -0.9);
-    addDoor(3050, 2750, 750, -0.8);
-    addDoor(5380, 2820, 750, -1.2);
+    // 1-A) Toilet Floor Slabs (Burgundy Tile Floor)
+    const f1NamFloorShape = new THREE.Shape();
+    [[765, 410], [2150, 410], [2150, 2656], [1974, 2750], [765, 2640]].forEach(([x, z], i) => {
+      if (i === 0) f1NamFloorShape.moveTo(x, -z);
+      else f1NamFloorShape.lineTo(x, -z);
+    });
+    f1NamFloorShape.closePath();
+    const f1NamFloorGeom = new THREE.ExtrudeGeometry(f1NamFloorShape, { depth: 4, bevelEnabled: false });
+    f1NamFloorGeom.rotateX(-Math.PI / 2);
+    applyBoxUV(f1NamFloorGeom, 400, 400);
+    const f1NamFloorMesh = new THREE.Mesh(f1NamFloorGeom, burgundyTileMat);
+    f1NamFloorMesh.position.y = 2;
+    f1NamFloorMesh.receiveShadow = true;
+
+    const f1NuFloorShape = new THREE.Shape();
+    [[2150, 410], [3050, 410], [3050, 2770], [2150, 2656]].forEach(([x, z], i) => {
+      if (i === 0) f1NuFloorShape.moveTo(x, -z);
+      else f1NuFloorShape.lineTo(x, -z);
+    });
+    f1NuFloorShape.closePath();
+    const f1NuFloorGeom = new THREE.ExtrudeGeometry(f1NuFloorShape, { depth: 4, bevelEnabled: false });
+    f1NuFloorGeom.rotateX(-Math.PI / 2);
+    applyBoxUV(f1NuFloorGeom, 400, 400);
+    const f1NuFloorMesh = new THREE.Mesh(f1NuFloorGeom, burgundyTileMat);
+    f1NuFloorMesh.position.y = 2;
+    f1NuFloorMesh.receiveShadow = true;
+
+    g.add(f1NamFloorMesh, f1NuFloorMesh);
+
+    // 1-B) North Outer Wall Interior Burgundy Tile Lining (y: 0 ~ 1600mm) + LED Strip at 1600mm
+    const northTileW = 3050 - 765;
+    const northTile = new THREE.Mesh(new THREE.BoxGeometry(northTileW, 1600, 24), burgundyTileMat);
+    applyBoxUV(northTile.geometry, 480, 480);
+    northTile.position.set((765 + 3050) / 2, 800, 422);
+    northTile.receiveShadow = true;
+
+    const northLed = new THREE.Mesh(new THREE.BoxGeometry(northTileW, 22, 28), ledStripGlowMat);
+    northLed.position.set((765 + 3050) / 2, 1600, 424);
+    g.add(northTile, northLed);
+
+    // 1-C) Ambient Warm Illumination from the 160cm LED Strip inside both restrooms
+    const namLight = new THREE.PointLight(0xffdfa8, 0.9, 3500, 0);
+    namLight.position.set(1450, 1620, 1500);
+    const nuLight = new THREE.PointLight(0xffdfa8, 0.9, 3500, 0);
+    nuLight.position.set(2600, 1620, 1600);
+    g.add(namLight, nuLight);
+
+    // Toilets and All Doors Completely Closed Flush with Wall
+    addToilet(1520, 920, 0);
+    addToilet(2600, 920, 0);
+    addDoor(2090, 2656, 710, -1.477);       // 1F WC Nam door - closed
+    addDoor(3050, 2700, 750, -Math.PI / 2);  // 1F WC Nu door - closed
+    addDoor(5355, 2850, 750, 0);             // 1F Kitchen/dishwashing door - closed
   } else if (fNum === 2) {
+    // 2-A) Toilet Floor Slab (Burgundy Tile Floor)
+    const f2FloorShape = new THREE.Shape();
+    [[-2350, 50], [-1130, 50], [-1130, 2370], [-2350, 2370]].forEach(([x, z], i) => {
+      if (i === 0) f2FloorShape.moveTo(x, -z);
+      else f2FloorShape.lineTo(x, -z);
+    });
+    f2FloorShape.closePath();
+    const f2FloorGeom = new THREE.ExtrudeGeometry(f2FloorShape, { depth: 4, bevelEnabled: false });
+    f2FloorGeom.rotateX(-Math.PI / 2);
+    applyBoxUV(f2FloorGeom, 400, 400);
+    const f2FloorMesh = new THREE.Mesh(f2FloorGeom, burgundyTileMat);
+    f2FloorMesh.position.y = 2;
+    f2FloorMesh.receiveShadow = true;
+    g.add(f2FloorMesh);
+
+    // 2-B) North & West Outer Wall Interior Burgundy Tile Lining (y: 0 ~ 1600mm) + LED Strip
+    const f2NorthW = -1130 - -2350;
+    const f2NorthTile = new THREE.Mesh(new THREE.BoxGeometry(f2NorthW, 1600, 24), burgundyTileMat);
+    applyBoxUV(f2NorthTile.geometry, 480, 480);
+    f2NorthTile.position.set((-2350 + -1130) / 2, 800, 62);
+    const f2NorthLed = new THREE.Mesh(new THREE.BoxGeometry(f2NorthW, 22, 28), ledStripGlowMat);
+    f2NorthLed.position.set((-2350 + -1130) / 2, 1600, 64);
+
+    const f2WestD = 2370 - 50;
+    const f2WestTile = new THREE.Mesh(new THREE.BoxGeometry(24, 1600, f2WestD), burgundyTileMat);
+    applyBoxUV(f2WestTile.geometry, 480, 480);
+    f2WestTile.position.set(-2338, 800, (50 + 2370) / 2);
+    const f2WestLed = new THREE.Mesh(new THREE.BoxGeometry(28, 22, f2WestD), ledStripGlowMat);
+    f2WestLed.position.set(-2336, 1600, (50 + 2370) / 2);
+
+    g.add(f2NorthTile, f2NorthLed, f2WestTile, f2WestLed);
+
+    const f2WcLight = new THREE.PointLight(0xffdfa8, 0.9, 3500, 0);
+    f2WcLight.position.set(-1740, 1620, 1200);
+    g.add(f2WcLight);
+
     addToilet(-1650, 520, 0);
-    addDoor(-1150, 2380, 750, -0.8);
+    addDoor(-1130, 2367, 720, -1.622); // 2F WC door - closed
   } else if (fNum === 3) {
+    // 3F WC
+    const f3FloorShape = new THREE.Shape();
+    [[2050, 300], [4050, 300], [4050, 2000], [3240, 2000], [2050, 1800]].forEach(([x, z], i) => {
+      if (i === 0) f3FloorShape.moveTo(x, -z);
+      else f3FloorShape.lineTo(x, -z);
+    });
+    f3FloorShape.closePath();
+    const f3FloorGeom = new THREE.ExtrudeGeometry(f3FloorShape, { depth: 4, bevelEnabled: false });
+    f3FloorGeom.rotateX(-Math.PI / 2);
+    applyBoxUV(f3FloorGeom, 400, 400);
+    const f3FloorMesh = new THREE.Mesh(f3FloorGeom, burgundyTileMat);
+    f3FloorMesh.position.y = 2;
+    f3FloorMesh.receiveShadow = true;
+    g.add(f3FloorMesh);
+
+    const f3WcLight = new THREE.PointLight(0xffdfa8, 0.9, 3500, 0);
+    f3WcLight.position.set(2800, 1620, 1000);
+    g.add(f3WcLight);
+
     addToilet(2280, 950, Math.PI / 2);
+    addDoor(3240, 1924, 800, 0.097); // 3F WC door - closed
   }
 
   return g;
@@ -1314,15 +1489,15 @@ function createIllustratedLightBoxCanopy(xCenter, zCenter, width, depth, bottomY
   canopyGroup.position.set(xCenter, 0, zCenter);
   canopyGroup.rotation.y = rotY;
 
-  // 4 Vertical Illustrated Banner Sides + Dark Top Cap + Glowing Diffuser Bottom Panel
+  // 4 Vertical Cream Banner Sides + Dark Top Cap + Glowing Diffuser Bottom Panel
   // Material array for BoxGeometry: [+X right, -X left, +Y top, -Y bottom, +Z front, -Z back]
   const boxMats = [
-    canopyArtSideMat,
-    canopyArtSideMat,
+    creamCanopyMat,
+    creamCanopyMat,
     darkMetalMat,
     canopyDiffuserMat,
-    canopyArtSideMat,
-    canopyArtSideMat,
+    creamCanopyMat,
+    creamCanopyMat,
   ];
   const boxGeom = new THREE.BoxGeometry(width, height, depth);
   const canopyMesh = new THREE.Mesh(boxGeom, boxMats);
@@ -1549,10 +1724,11 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
       metalness: 0.05,
     });
 
+    // Architectural Deep Burgundy Entrance Sash Frame Material (#4E1218)
     const sashFrameMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1c1f,
-      roughness: 0.28,
-      metalness: 0.78,
+      color: 0x4e1218,
+      roughness: 0.32,
+      metalness: 0.58,
     });
 
     const thresholdStoneMat = new THREE.MeshStandardMaterial({
@@ -1955,6 +2131,13 @@ function buildModel() {
     });
 
     // 4. Inner Partition Walls (Photo 2 Raw Concrete & Framed Glass VIP Partitions)
+    const wcWallIds = new Set([
+      'f1_wc_nam_left', 'f1_wc_nam_bot', 'f1_wc_nam_right', 'f1_wc_nam_stub',
+      'f1_wc_nu_right', 'f1_wc_nu_bot',
+      'f2_wc_stub', 'f2_wc_right'
+    ]);
+    const kitchenTileWallIds = new Set(['f1_gas_right', 'f1_gas_left']);
+
     fData.inner_walls.forEach((w) => {
       if (w.id === 'f1_front_glass') return; // Replaced by 1F Storefront Exterior Facade (Photo 4)
       const isGlass = !!w.glass;
@@ -1974,7 +2157,18 @@ function buildModel() {
             roughness: 0.82,
             metalness: 0.04,
           });
-      const mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
+
+      let mesh;
+      if (wcWallIds.has(w.id)) {
+        // Bathroom Walls: 0 ~ 160cm Burgundy Tile Wainscot + LED Strip Lighting at 160cm + Exposed Raw Concrete above
+        mesh = createSplitWallMesh(w.poly, w.h, 1600, burgundyTileMat, mat, ledStripGlowMat);
+      } else if (kitchenTileWallIds.has(w.id)) {
+        // Kitchen Wall (Next to Sink): White Mosaic Tile up to 2040mm matching Kitchen Back Wall + Exposed Concrete above
+        mesh = createSplitWallMesh(w.poly, w.h, 2040, whiteMosaicTileMat, mat, darkMetalMat);
+      } else {
+        mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
+      }
+
       mesh.userData = {
         name: `TẦNG ${fNum} 내부 칸막이벽 (${w.id})`,
         height: w.h,
@@ -2158,7 +2352,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Perspective matching Photo 3 (looking along the L-shaped terracotta bar & illustrated canopy!)
       camera.position.set(18750, 1620, 3550);
       controls.target.set(11800, 1500, 2150);
-      banner.textContent = '🍷 1F 오픈키친 바 시점: 천장 일러스트 라이트박스 후드 + 2단 테라코타 & 화이트 모자이크 카운터 + 원형 메탈 스툴';
+      banner.textContent = '🍷 1F 오픈키친 바 시점: 천장 크림색 라이트박스 조명 + 버건디 바 카운터 + 주방 타일 벽면';
     } else if (preset === 'f1_dj') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
