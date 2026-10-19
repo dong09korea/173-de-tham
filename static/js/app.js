@@ -1611,11 +1611,6 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     exhaustHood.castShadow = true;
     dGroup.add(exhaustHood);
 
-    // Warm under-hood task light illuminating the cooking line (Photo 3 left background)
-    const hoodLight = new THREE.PointLight(0xffe4ad, 1.1, 5200, 0);
-    hoodLight.position.set(10650, 1920, 950);
-    dGroup.add(hoodLight);
-
     // Right Open Kitchen Stainless Steel Wall Shelves (x: 13600 ~ 18000, matching Photo 3 right side!)
     const shelfSections = [
       { cx: 14750, w: 2050, y: 1780 },
@@ -1657,15 +1652,8 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     });
 
     // ------------------------------------------------------------------------
-    // 3) PHOTO 3: SUSPENDED ILLUSTRATED LIGHT BOX CANOPY HOODS (50% SLIMMER & L-SHAPED OVER BAR TABLE)
+    // 3) KITCHEN LIGHT BOX CANOPY REMOVED (Per user request)
     // ------------------------------------------------------------------------
-    // Rear-left canopy: directly centered above Left Bar Table (x: 9190 ~ 14350, zCenter: 2885, depth: 460mm = 50% reduced, height: 260mm)
-    const canopyLeft = createIllustratedLightBoxCanopy(11770, 2885, 5200, 460, 2160, 260, floorHeight - 150, 0);
-    // Front-right canopy: directly centered above Right Front Bar Table (x: 15330 ~ 18140, zCenter: 2885, depth: 460mm, height: 260mm)
-    const canopyRight = createIllustratedLightBoxCanopy(16735, 2885, 2810, 460, 2160, 260, floorHeight - 150, 0);
-    // L-bent side canopy: directly centered above the L-bent Side Bar Table (xCenter: 17910, z: 550 ~ 2655, depth: 460mm, height: 260mm)
-    const canopySide = createIllustratedLightBoxCanopy(17910, 1602, 2105, 460, 2160, 260, floorHeight - 150, Math.PI / 2);
-    dGroup.add(canopyLeft, canopyRight, canopySide);
 
     // ------------------------------------------------------------------------
     // 4) PHOTO 3: 2-TIER TERRACOTTA / BURNT-SIENNA BAR COUNTER + WHITE MOSAIC TILE BASE
@@ -2380,7 +2368,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Perspective matching Photo 3 (looking along the L-shaped terracotta bar & illustrated canopy!)
       camera.position.set(18750, 1620, 3550);
       controls.target.set(11800, 1500, 2150);
-      banner.textContent = '🍷 1F 오픈키친 바 시점: 천장 크림색 라이트박스 조명 + 버건디 바 카운터 + 주방 타일 벽면';
+      banner.textContent = '🍷 1F 오픈키친 바 시점: 시원하게 개방된 높은 층고의 오픈키친 + 2단 버건디 바 카운터 + 주방 타일 벽면';
     } else if (preset === 'f1_dj') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
