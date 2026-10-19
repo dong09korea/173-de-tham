@@ -422,141 +422,202 @@ function getPolyBounds(poly) {
 }
 
 // ============================================================================
-// PHOTO 3: INDUSTRIAL ROUND METAL BAR STOOL (Champagne-Silver Padded Seat + 4 Chrome Legs + Double Footrest Rings)
+// 4-LEGGED TUBULAR CHROME & COGNAC-BROWN LEATHER ROUND CHAIR (Matching Reference Photo)
 // ============================================================================
-const stoolSeatVinylMat = new THREE.MeshPhysicalMaterial({
-  color: 0xc9c0b3,
-  roughness: 0.28,
-  metalness: 0.22,
-  clearcoat: 0.35,
-  clearcoatRoughness: 0.2,
+const cognacLeatherMat = new THREE.MeshPhysicalMaterial({
+  color: 0x7b4324,
+  roughness: 0.34,
+  metalness: 0.04,
+  clearcoat: 0.24,
+  clearcoatRoughness: 0.32,
 });
 
-function createIndustrialMetalStool(x, z) {
+function createChromeLeatherRoundChair(x, z, facingAngle = 0, seatY = 460) {
   const g = new THREE.Group();
 
-  // Contact shadow under stool
-  const stoolShadow = new THREE.Mesh(new THREE.PlaneGeometry(380, 380), contactShadowMat);
-  stoolShadow.rotation.x = -Math.PI / 2;
-  stoolShadow.position.y = 2;
-  g.add(stoolShadow);
-
-  const seatH = 660;
-  const seatR = 175;
-
-  // Plump round padded champagne-silver vinyl seat cushion + dome top
-  const cushionCyl = new THREE.Mesh(new THREE.CylinderGeometry(seatR, seatR - 6, 72, 28), stoolSeatVinylMat);
-  cushionCyl.position.y = seatH - 36;
-  cushionCyl.castShadow = true;
-  g.add(cushionCyl);
-
-  const domeCap = new THREE.Mesh(
-    new THREE.SphereGeometry(seatR, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2.8),
-    stoolSeatVinylMat
-  );
-  domeCap.scale.set(1, 0.24, 1);
-  domeCap.position.y = seatH - 2;
-  domeCap.castShadow = true;
-  g.add(domeCap);
-
-  // Under-seat metal apron ring
-  const underPlate = new THREE.Mesh(new THREE.CylinderGeometry(140, 140, 14, 20), chromeTubularMat);
-  underPlate.position.y = seatH - 78;
-  g.add(underPlate);
-
-  // 4 Slightly Splayed Tubular Chrome Steel Legs
-  const legLen = seatH - 75;
-  const topOffset = 115;
-  const botOffset = 158;
-  for (let i = 0; i < 4; i++) {
-    const ang = (i * Math.PI) / 2 + Math.PI / 4;
-    const tx = Math.cos(ang) * topOffset;
-    const tz = Math.sin(ang) * topOffset;
-    const bx = Math.cos(ang) * botOffset;
-    const bz = Math.sin(ang) * botOffset;
-
-    const legGeom = new THREE.CylinderGeometry(11, 10, legLen, 12);
-    const leg = new THREE.Mesh(legGeom, chromeTubularMat);
-    leg.position.set((tx + bx) / 2, legLen / 2, (tz + bz) / 2);
-    // Tilt leg outward slightly
-    const dx = bx - tx;
-    const dz = bz - tz;
-    leg.rotation.z = -dx / legLen;
-    leg.rotation.x = dz / legLen;
-    leg.castShadow = true;
-    g.add(leg);
-
-    // Rubber floor foot cap
-    const footCap = new THREE.Mesh(new THREE.CylinderGeometry(12, 13, 18, 12), darkMetalMat);
-    footCap.position.set(bx, 9, bz);
-    g.add(footCap);
-  }
-
-  // Double Circular Tubular Footrest Rings (Characteristic of Photo 3 stools!)
-  const upperRing = new THREE.Mesh(new THREE.TorusGeometry(138, 8, 10, 28), chromeTubularMat);
-  upperRing.rotation.x = Math.PI / 2;
-  upperRing.position.y = 275;
-  const lowerRing = new THREE.Mesh(new THREE.TorusGeometry(146, 8, 10, 28), chromeTubularMat);
-  lowerRing.rotation.x = Math.PI / 2;
-  lowerRing.position.y = 185;
-  g.add(upperRing, lowerRing);
-
-  g.position.set(x, 0, z);
-  return g;
-}
-
-// ============================================================================
-// PHOTO 2: DINING CHAIR (Bentwood & Cane Webbing Backrest Chair seen at bottom of Photo 2)
-// ============================================================================
-const caneMeshMat = new THREE.MeshStandardMaterial({
-  color: 0xc2a87e,
-  roughness: 0.72,
-});
-
-function createCafeDiningChair(x, z, facingAngle = 0) {
-  const g = new THREE.Group();
-  const seatY = 450;
-
-  const chairShadow = new THREE.Mesh(new THREE.PlaneGeometry(420, 420), contactShadowMat);
+  const chairShadow = new THREE.Mesh(new THREE.PlaneGeometry(430, 430), contactShadowMat);
   chairShadow.rotation.x = -Math.PI / 2;
   chairShadow.position.y = 2;
   g.add(chairShadow);
 
-  // Dark wood frame seat + cane insert
-  const seatFrame = new THREE.Mesh(new RoundedBoxGeometry(410, 32, 410, 2, 10), darkTableWoodMat);
-  seatFrame.position.y = seatY;
-  seatFrame.castShadow = true;
-  const seatCane = new THREE.Mesh(new RoundedBoxGeometry(360, 8, 360, 1, 4), caneMeshMat);
-  seatCane.position.y = seatY + 14;
-  g.add(seatFrame, seatCane);
+  const seatR = 184;
+  const ringR = 198;
+  const tubeR = 11.5;
+  const hoopY = seatY + 235;
 
-  // 4 Legs
-  [
-    [-175, -175],
-    [175, -175],
-    [-175, 175],
-    [175, 175],
-  ].forEach(([lx, lz]) => {
-    const leg = new THREE.Mesh(new THREE.CylinderGeometry(14, 11, seatY, 12), darkMetalMat);
-    leg.position.set(lx, seatY / 2, lz);
-    leg.castShadow = true;
-    g.add(leg);
+  // 1) Plump Round Cognac-Brown Leather Seat Cushion nestled inside the chrome ring
+  const cushionBase = new THREE.Mesh(new THREE.CylinderGeometry(seatR, seatR - 6, 52, 36), cognacLeatherMat);
+  cushionBase.position.y = seatY - 6;
+  cushionBase.castShadow = true;
+  cushionBase.receiveShadow = true;
+  g.add(cushionBase);
+
+  const cushionDome = new THREE.Mesh(
+    new THREE.SphereGeometry(seatR, 36, 16, 0, Math.PI * 2, 0, Math.PI / 2.5),
+    cognacLeatherMat
+  );
+  cushionDome.scale.set(1, 0.24, 1);
+  cushionDome.position.y = seatY + 18;
+  cushionDome.castShadow = true;
+  cushionDome.receiveShadow = true;
+  g.add(cushionDome);
+
+  const seatUnderPan = new THREE.Mesh(new THREE.CylinderGeometry(seatR - 10, seatR - 16, 12, 28), darkMetalMat);
+  seatUnderPan.position.y = seatY - 34;
+  g.add(seatUnderPan);
+
+  // 2) Circular Polished Chrome Seat Frame Ring encircling the round leather seat
+  const seatRing = new THREE.Mesh(new THREE.TorusGeometry(ringR, tubeR, 16, 44), chromeTubularMat);
+  seatRing.rotation.x = Math.PI / 2;
+  seatRing.position.y = seatY - 8;
+  seatRing.castShadow = true;
+  g.add(seatRing);
+
+  // 3) Continuous Polished Chrome Tubular Frame:
+  //    Front-left vertical leg -> 90° top elbow -> circular backrest hoop around +Z -> 90° top elbow -> Front-right vertical leg
+  const startAng = -0.46; // ~26° ahead of side axis on the circle of radius ringR
+  const endAng = Math.PI + 0.46;
+  const elbowR = 38;
+  const fxL = -ringR * Math.cos(startAng);
+  const fzL = ringR * Math.sin(startAng);
+  const fxR = ringR * Math.cos(startAng);
+  const fzR = ringR * Math.sin(startAng);
+
+  // Tangent unit vector at startAng along the circle
+  const tanAngL = startAng + 0.18;
+  const arcStartL = new THREE.Vector3(-ringR * Math.cos(tanAngL), hoopY, ringR * Math.sin(tanAngL));
+  const arcEndR = new THREE.Vector3(ringR * Math.cos(tanAngL), hoopY, ringR * Math.sin(tanAngL));
+
+  const hoopCurve = new THREE.CurvePath();
+  // Left front leg rising from floor to elbow
+  hoopCurve.add(
+    new THREE.LineCurve3(new THREE.Vector3(fxL, 10, fzL), new THREE.Vector3(fxL, hoopY - elbowR, fzL))
+  );
+  // Left 90-degree smooth elbow bend into circular hoop
+  hoopCurve.add(
+    new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(fxL, hoopY - elbowR, fzL),
+      new THREE.Vector3(fxL, hoopY, fzL),
+      arcStartL
+    )
+  );
+  // Circular backrest hoop wrapping around the rear (+Z)
+  const arcSegments = 20;
+  for (let i = 0; i < arcSegments; i++) {
+    const a0 = tanAngL + (i / arcSegments) * (Math.PI - 2 * tanAngL);
+    const a1 = tanAngL + ((i + 1) / arcSegments) * (Math.PI - 2 * tanAngL);
+    hoopCurve.add(
+      new THREE.LineCurve3(
+        new THREE.Vector3(-ringR * Math.cos(a0), hoopY, ringR * Math.sin(a0)),
+        new THREE.Vector3(-ringR * Math.cos(a1), hoopY, ringR * Math.sin(a1))
+      )
+    );
+  }
+  // Right 90-degree smooth elbow bend down into right front leg
+  hoopCurve.add(
+    new THREE.QuadraticBezierCurve3(
+      arcEndR,
+      new THREE.Vector3(fxR, hoopY, fzR),
+      new THREE.Vector3(fxR, hoopY - elbowR, fzR)
+    )
+  );
+  // Right front leg descending to floor
+  hoopCurve.add(
+    new THREE.LineCurve3(new THREE.Vector3(fxR, hoopY - elbowR, fzR), new THREE.Vector3(fxR, 10, fzR))
+  );
+
+  const hoopGeom = new THREE.TubeGeometry(hoopCurve, 72, tubeR, 16, false);
+  const hoopMesh = new THREE.Mesh(hoopGeom, chromeTubularMat);
+  hoopMesh.castShadow = true;
+  g.add(hoopMesh);
+
+  // 4) 2 Rear Vertical Chrome Legs rising from floor through the circular seat ring up to the rear backrest hoop
+  const rearAngles = [0.88, Math.PI - 0.88];
+  rearAngles.forEach((ra) => {
+    const rx = -ringR * Math.cos(ra);
+    const rz = ringR * Math.sin(ra);
+    const rearLegH = hoopY - 10;
+    const rearLeg = new THREE.Mesh(new THREE.CylinderGeometry(tubeR, tubeR, rearLegH, 16), chromeTubularMat);
+    rearLeg.position.set(rx, 10 + rearLegH / 2, rz);
+    rearLeg.castShadow = true;
+    g.add(rearLeg);
   });
 
-  // Curved Bentwood & Cane Backrest (at +Z rear of chair)
-  const backFrame = new THREE.Mesh(new RoundedBoxGeometry(400, 250, 26, 2, 10), darkMetalMat);
-  backFrame.position.set(0, seatY + 230, 185);
-  const backCane = new THREE.Mesh(new RoundedBoxGeometry(350, 200, 12, 1, 4), caneMeshMat);
-  backCane.position.set(0, seatY + 230, 185);
-  const postL = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 240, 10), darkMetalMat);
-  postL.position.set(-180, seatY + 120, 185);
-  const postR = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 240, 10), darkMetalMat);
-  postR.position.set(180, seatY + 120, 185);
-  g.add(backFrame, backCane, postL, postR);
+  // White/Silver Floor Glides on all 4 legs
+  [
+    [fxL, fzL],
+    [fxR, fzR],
+    [-ringR * Math.cos(rearAngles[0]), ringR * Math.sin(rearAngles[0])],
+    [-ringR * Math.cos(rearAngles[1]), ringR * Math.sin(rearAngles[1])],
+  ].forEach(([gx, gz]) => {
+    const glide = new THREE.Mesh(new THREE.CylinderGeometry(tubeR - 0.5, tubeR - 1.5, 10, 14), whitePorcelainMat);
+    glide.position.set(gx, 5, gz);
+    g.add(glide);
+  });
+
+  // 5) Curved Cognac-Brown Leather Padded Backrest Bolster + Rear Chrome Backing Strap & Studs
+  const padStart = 0.36;
+  const padEnd = Math.PI - 0.36;
+  const padShape = new THREE.Shape();
+  padShape.absarc(0, 0, ringR - 3, padStart, padEnd, false);
+  padShape.absarc(0, 0, ringR - 31, padEnd, padStart, true);
+  padShape.closePath();
+
+  const padH = 82;
+  const padGeom = new THREE.ExtrudeGeometry(padShape, {
+    depth: padH,
+    bevelEnabled: true,
+    bevelThickness: 10,
+    bevelSize: 7,
+    bevelSegments: 4,
+  });
+  padGeom.rotateX(Math.PI / 2);
+  const padMesh = new THREE.Mesh(padGeom, cognacLeatherMat);
+  padMesh.position.y = hoopY + padH / 2 + 4;
+  padMesh.castShadow = true;
+  padMesh.receiveShadow = true;
+  g.add(padMesh);
+
+  // Curved Chrome Backing Plate on the outside (+Z) of the backrest
+  const plateStart = 0.44;
+  const plateEnd = Math.PI - 0.44;
+  const plateShape = new THREE.Shape();
+  plateShape.absarc(0, 0, ringR + 13, plateStart, plateEnd, false);
+  plateShape.absarc(0, 0, ringR + 4, plateEnd, plateStart, true);
+  plateShape.closePath();
+
+  const plateH = 48;
+  const plateGeom = new THREE.ExtrudeGeometry(plateShape, {
+    depth: plateH,
+    bevelEnabled: true,
+    bevelThickness: 3,
+    bevelSize: 2,
+    bevelSegments: 2,
+  });
+  plateGeom.rotateX(Math.PI / 2);
+  const plateMesh = new THREE.Mesh(plateGeom, chromeTubularMat);
+  plateMesh.position.y = hoopY + plateH / 2 + 6;
+  g.add(plateMesh);
+
+  // Subtle circular chrome footrest ring for taller bar-height chairs
+  if (seatY > 520) {
+    const footRing = new THREE.Mesh(new THREE.TorusGeometry(ringR, 8, 12, 36), chromeTubularMat);
+    footRing.rotation.x = Math.PI / 2;
+    footRing.position.y = 210;
+    g.add(footRing);
+  }
 
   g.position.set(x, 0, z);
   g.rotation.y = facingAngle;
   return g;
+}
+
+function createIndustrialMetalStool(x, z, facingAngle = 0) {
+  return createChromeLeatherRoundChair(x, z, facingAngle, 610);
+}
+
+function createCafeDiningChair(x, z, facingAngle = 0) {
+  return createChromeLeatherRoundChair(x, z, facingAngle, 460);
 }
 
 // ============================================================================
@@ -1863,16 +1924,43 @@ function buildModel() {
       fixGroup.add(detailedModel);
     });
 
-    // Photo 3 Industrial Round Metal Bar Stools at exact CAD stool coordinates
+    // 4-Legged Tubular Chrome & Cognac-Brown Leather Bar Chairs at exact CAD stool coordinates
     fData.stools.forEach((pt) => {
-      const stool = createIndustrialMetalStool(pt[0], pt[1]);
+      let sRot = 0;
+      if (fNum === 1 && pt[0] > 18000) {
+        sRot = Math.PI / 2; // Side L-bar seats face -X toward the side bar counter
+      } else if (fNum === 2) {
+        sRot = Math.atan2(-(12850 - pt[0]), -(520 - pt[1])); // Face center of 2F semi-circular beer bar
+      }
+      const stool = createIndustrialMetalStool(pt[0], pt[1], sRot);
       fixGroup.add(stool);
     });
 
-    // Photo 2 Bentwood & Cane Dining Chairs at exact CAD chair coordinates
+    // 4-Legged Tubular Chrome & Cognac-Brown Leather Dining Chairs at exact CAD chair coordinates
+    const floorTables = fData.fixtures
+      .filter((fx) => fx.type === 'table')
+      .map((fx) => getPolyBounds(fx.poly));
+
     fData.chairs.forEach((pt) => {
-      const isTopRow = (fNum === 1 && pt[1] < 1650) || (fNum === 2 && (pt[1] < 1400 || (pt[0] > 20000 && pt[1] < 1900)));
-      const rot = isTopRow ? Math.PI : 0;
+      let rot = 0;
+      if (floorTables.length > 0) {
+        let nearest = floorTables[0];
+        let minDist = Infinity;
+        floorTables.forEach((tb) => {
+          const d2 = (tb.cx - pt[0]) ** 2 + (tb.cz - pt[1]) ** 2;
+          if (d2 < minDist) {
+            minDist = d2;
+            nearest = tb;
+          }
+        });
+        const dx = nearest.cx - pt[0];
+        const dz = nearest.cz - pt[1];
+        if (Math.abs(dx) > Math.abs(dz)) {
+          rot = dx > 0 ? -Math.PI / 2 : Math.PI / 2;
+        } else {
+          rot = dz > 0 ? Math.PI : 0;
+        }
+      }
       const chair = createCafeDiningChair(pt[0], pt[1], rot);
       fixGroup.add(chair);
     });
