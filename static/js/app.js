@@ -1611,6 +1611,11 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     exhaustHood.castShadow = true;
     dGroup.add(exhaustHood);
 
+    // Cooking line task light under the stainless exhaust hood
+    const hoodLight = new THREE.PointLight(0xffe4ad, 1.1, 5200, 0);
+    hoodLight.position.set(10650, 1920, 950);
+    dGroup.add(hoodLight);
+
     // Right Open Kitchen Stainless Steel Wall Shelves (x: 13600 ~ 18000, matching Photo 3 right side!)
     const shelfSections = [
       { cx: 14750, w: 2050, y: 1780 },
