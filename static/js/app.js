@@ -1413,12 +1413,12 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     fixedGlassMid.position.set(sashX, 1257.5, rightZCenter);
     facadeGroup.add(lowerHorizBar, midTransomBar, fixedGlassBot, fixedGlassMid);
 
-    // Upper Push-Out Awning Window Group (Top-hinged at x = sashX, y = 2426, tilted outward toward +X!)
+    // Upper Push-Out Awning Window Group (Top-hinged at x = sashX + 35, y = 2426, pushed ALL THE WAY OUTWARD toward +X!)
     const awningH = 878;
     const awningPivot = new THREE.Group();
-    awningPivot.position.set(sashX + 18, 2426, rightZCenter);
-    // Tilt outward toward +X street side by ~23 degrees (-0.40 rad around Z axis)
-    awningPivot.rotation.z = -0.40;
+    awningPivot.position.set(sashX + 35, 2426, rightZCenter);
+    // Positive rotation.z swings negative-Y points (+y * sin(theta)) OUTWARD toward +X (street side) by ~77 degrees!
+    awningPivot.rotation.z = 1.35;
 
     const awFrameThick = 46;
     const awTopRail = new THREE.Mesh(new THREE.BoxGeometry(58, awFrameThick, rightW - 8), sashFrameMat);
@@ -1437,11 +1437,11 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     awningPivot.add(awTopRail, awBotRail, awLeftStile, awRightStile, awGlass);
     facadeGroup.add(awningPivot);
 
-    // Black Metal Friction Stay Support Arms holding the push-out awning window open on both sides
+    // Black Metal Friction Stay Support Arms holding the fully-open push-out awning window on both sides
     [775, 2780].forEach((armZ) => {
-      const stayArm = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 340, 10), sashFrameMat);
-      stayArm.position.set(sashX + 135, 1690, armZ);
-      stayArm.rotation.z = 1.18;
+      const stayArm = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 680, 10), sashFrameMat);
+      stayArm.position.set(sashX + 285, 2045, armZ);
+      stayArm.rotation.z = -0.76;
       facadeGroup.add(stayArm);
     });
 
