@@ -1203,8 +1203,6 @@ function buildArchitecturalDoorsAndToilets(fNum) {
   } else if (fNum === 2) {
     addToilet(-1650, 520, 0);
     addDoor(-1150, 2380, 750, -0.8);
-    addDoor(17550, 3050, 850, -1.1);
-    addDoor(20300, 4200, 850, 0.8);
   } else if (fNum === 3) {
     addToilet(2280, 950, Math.PI / 2);
   }
@@ -1759,54 +1757,6 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     });
   } else if (fNum === 2) {
     // ------------------------------------------------------------------------
-    // 2F SEMI-CIRCULAR CRAFT BEER BAR (QUẦY LẤY BIA) IN MATCHING WHITE MOSAIC + TERRACOTTA STYLE
-    // ------------------------------------------------------------------------
-    const circleBarShadow = new THREE.Mesh(new THREE.RingGeometry(1000, 1920, 36, 1, 0, Math.PI), contactShadowMat);
-    circleBarShadow.rotation.x = -Math.PI / 2;
-    circleBarShadow.position.set(12850, 2, 520);
-    dGroup.add(circleBarShadow);
-
-    const arcShape = new THREE.Shape();
-    arcShape.absarc(0, 0, 1840, 0, Math.PI, false);
-    arcShape.absarc(0, 0, 1120, Math.PI, 0, true);
-    arcShape.closePath();
-
-    // White Mosaic Tile Curved Base Drum
-    const baseExtrude = new THREE.ExtrudeGeometry(arcShape, { depth: 880, bevelEnabled: false });
-    baseExtrude.rotateX(Math.PI / 2);
-    applyCylindricalUV(baseExtrude, 1840, 880, 480);
-    const barMosaicBase = new THREE.Mesh(baseExtrude, whiteMosaicTileMat);
-    barMosaicBase.position.set(12850, 880, 520);
-    barMosaicBase.castShadow = true;
-
-    // Lower Terracotta Dining Countertop Arc
-    const topShape = new THREE.Shape();
-    topShape.absarc(0, 0, 1920, 0, Math.PI, false);
-    topShape.absarc(0, 0, 1080, Math.PI, 0, true);
-    topShape.closePath();
-    const topExtrude = new THREE.ExtrudeGeometry(topShape, { depth: 80, bevelEnabled: false });
-    topExtrude.rotateX(Math.PI / 2);
-    const barTerraTop = new THREE.Mesh(topExtrude, terracottaCounterMat);
-    barTerraTop.position.set(12850, 955, 520);
-    barTerraTop.castShadow = true;
-
-    // Upper Terracotta Raised Service Step Arc
-    const riserShape = new THREE.Shape();
-    riserShape.absarc(0, 0, 1520, 0, Math.PI, false);
-    riserShape.absarc(0, 0, 1080, Math.PI, 0, true);
-    riserShape.closePath();
-    const riserExtrude = new THREE.ExtrudeGeometry(riserShape, { depth: 155, bevelEnabled: false });
-    riserExtrude.rotateX(Math.PI / 2);
-    const barTerraRiser = new THREE.Mesh(riserExtrude, terracottaCounterMat);
-    barTerraRiser.position.set(12850, 1110, 520);
-    barTerraRiser.castShadow = true;
-
-    // Chrome Draft Beer Tap Tower
-    const tapBridge = new THREE.Mesh(new RoundedBoxGeometry(950, 420, 120, 3, 14), stainlessMat);
-    tapBridge.position.set(12850, 1150, 1050);
-    dGroup.add(barMosaicBase, barTerraTop, barTerraRiser, tapBridge);
-
-    // ------------------------------------------------------------------------
     // 2F FRONT FULL GLASS WINDOW (50% TOP / 50% BOTTOM SPLIT — TOP PUSHED OUTWARD OPEN)
     // Exact CAD f2_east_window opening: x = 23726.9 ~ 23929.7, z = 1270.3 ~ 4096.6 (width = 2826.3mm)
     // ------------------------------------------------------------------------
@@ -2224,7 +2174,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       updateFloorMode('2');
       camera.position.set(9200, 1650, 3300);
       controls.target.set(13200, 1550, 1200);
-      banner.textContent = '🍺 2F 반원형 맥주 바(QUẦY LẤY BIA) 내부 시점';
+      banner.textContent = '🛋️ 2F 중앙 오픈 홀 시점: 넓고 시원하게 개방된 중앙 공간';
     } else if (preset === 'f2_vip') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
@@ -2232,7 +2182,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       updateFloorMode('2');
       camera.position.set(16900, 1650, 3400);
       controls.target.set(19200, 1550, 1600);
-      banner.textContent = '🥂 2F VIP 01·02 프라이빗 룸 내부 시점';
+      banner.textContent = '🥂 2F VIP 오픈 다이닝 홀 시점: 벽체를 허물어 개방감을 높인 VIP 테이블 공간';
     }
     controls.update();
   });
