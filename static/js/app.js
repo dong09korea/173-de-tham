@@ -63,6 +63,9 @@ function loadArchitecturalTextures() {
   // Photo 3: Hand-Drawn Folk Art Illustrated Canopy Light Box Banner
   const canopyArtTex = loadPbr('./static/textures/canopy_folk_art.jpg', 1, 1);
 
+  // Photo 4: 1F Storefront Exterior Exposed Concrete Facade Texture
+  const facadeConcreteTex = loadPbr('./static/textures/facade_exposed_concrete.jpg', 1, 1);
+
   const timberTex = loadPbr('./static/textures/wood_walnut_grain.jpg', 1, 1);
   const graniteTex = loadPbr('./static/textures/stone_speckled_granite.jpg', 1, 1);
 
@@ -84,6 +87,7 @@ function loadArchitecturalTextures() {
     wallConcreteTex,
     whiteMosaicTex,
     canopyArtTex,
+    facadeConcreteTex,
     timberTex,
     graniteTex,
     shadowTex,
@@ -1260,6 +1264,193 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     terraRiserSide.castShadow = true;
     terraRiserSide.receiveShadow = true;
     dGroup.add(mosaicBaseSide, terraTopSide, terraRiserSide);
+
+    // ------------------------------------------------------------------------
+    // 5) PHOTO 4: 1F FRONT ENTRANCE EXTERIOR FACADE (EXPOSED CONCRETE + BLACK SASH & GLASS)
+    //    - Left (from outside looking in, +Z: z=2842.8~4005.5): Full-height Entrance Glass Door
+    //    - Right Bottom (-Z: z=691.0~2842.8, y=140~1520): Fixed Glass Panels with Horizontal Sash Bar
+    //    - Right Top (-Z: z=691.0~2842.8, y=1520~2426): Outward Push-Out Awning Glass Window
+    // ------------------------------------------------------------------------
+    const facadeGroup = new THREE.Group();
+
+    const facadeConcreteMat = new THREE.MeshStandardMaterial({
+      map: PBR_TEX.facadeConcreteTex,
+      bumpMap: PBR_TEX.facadeConcreteTex,
+      bumpScale: 1.8,
+      color: 0xd8d6d2,
+      roughness: 0.80,
+      metalness: 0.05,
+    });
+
+    const sashFrameMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1c1f,
+      roughness: 0.28,
+      metalness: 0.78,
+    });
+
+    const thresholdStoneMat = new THREE.MeshStandardMaterial({
+      map: PBR_TEX.graniteTex,
+      bumpMap: PBR_TEX.graniteTex,
+      bumpScale: 1.2,
+      color: 0x26292c,
+      roughness: 0.42,
+      metalness: 0.1,
+    });
+
+    const storefrontGlassMat = new THREE.MeshPhysicalMaterial({
+      color: 0xeef4f8,
+      roughness: 0.05,
+      transmission: 0.86,
+      transparent: true,
+      opacity: 0.28,
+      reflectivity: 0.65,
+      clearcoat: 0.9,
+    });
+
+    // 5-A) Bottom Dark Stone Threshold Curb (z: 314.5 ~ 4444.1, y: 0 ~ 140)
+    const curbGeom = new THREE.BoxGeometry(555, 140, 4130);
+    applyBoxUV(curbGeom, 1000, 300);
+    const curbMesh = new THREE.Mesh(curbGeom, thresholdStoneMat);
+    curbMesh.position.set(22795, 70, 2379.3);
+    curbMesh.receiveShadow = true;
+    facadeGroup.add(curbMesh);
+
+    // 5-B) Top Exposed Concrete Header Beam (z: 314.5 ~ 4444.1, y: 2480 ~ 3500)
+    const headerGeom = new THREE.BoxGeometry(535, 1020, 4130);
+    applyBoxUV(headerGeom, 2065, 1020);
+    const headerMesh = new THREE.Mesh(headerGeom, facadeConcreteMat);
+    headerMesh.position.set(22790, 2990, 2379.3);
+    headerMesh.castShadow = true;
+    headerMesh.receiveShadow = true;
+    facadeGroup.add(headerMesh);
+
+    // Subtle vertical joint seam in the center of the top concrete header (matching Photo 4!)
+    const headerSeam = new THREE.Mesh(new THREE.BoxGeometry(542, 1020, 12), sashFrameMat);
+    headerSeam.position.set(22790, 2990, 2379.3);
+    facadeGroup.add(headerSeam);
+
+    // 5-C) Left & Right Exposed Concrete Side Pillars (y: 140 ~ 2480)
+    // Left Pillar (when looking from outside toward -X, left is +Z: z = 4005.5 ~ 4444.1)
+    const leftPillarGeom = new THREE.BoxGeometry(535, 2340, 438.6);
+    applyBoxUV(leftPillarGeom, 1200, 1200);
+    const leftPillar = new THREE.Mesh(leftPillarGeom, facadeConcreteMat);
+    leftPillar.position.set(22790, 1310, 4224.8);
+    leftPillar.castShadow = true;
+    leftPillar.receiveShadow = true;
+
+    // Right Pillar (when looking from outside toward -X, right is -Z: z = 314.5 ~ 691.0)
+    const rightPillarGeom = new THREE.BoxGeometry(535, 2340, 376.5);
+    applyBoxUV(rightPillarGeom, 1200, 1200);
+    const rightPillar = new THREE.Mesh(rightPillarGeom, facadeConcreteMat);
+    rightPillar.position.set(22790, 1310, 502.75);
+    rightPillar.castShadow = true;
+    rightPillar.receiveShadow = true;
+    facadeGroup.add(leftPillar, rightPillar);
+
+    // 5-D) Black Metal Storefront Outer Sash Frame & Center Vertical Mullion (at x = 22950)
+    const sashX = 22950;
+    const sashDepth = 88;
+    const outerTopRail = new THREE.Mesh(new THREE.BoxGeometry(sashDepth, 54, 3314.5), sashFrameMat);
+    outerTopRail.position.set(sashX, 2453, 2348.25);
+    const outerBotSill = new THREE.Mesh(new THREE.BoxGeometry(sashDepth, 54, 3314.5), sashFrameMat);
+    outerBotSill.position.set(sashX, 167, 2348.25);
+    const outerLeftJamb = new THREE.Mesh(new THREE.BoxGeometry(sashDepth, 2340, 54), sashFrameMat);
+    outerLeftJamb.position.set(sashX, 1310, 3978.5);
+    const outerRightJamb = new THREE.Mesh(new THREE.BoxGeometry(sashDepth, 2340, 54), sashFrameMat);
+    outerRightJamb.position.set(sashX, 1310, 718.0);
+    // Main Vertical Mullion at z = 2842.8 separating Left Door & Right Window
+    const centerMullion = new THREE.Mesh(new THREE.BoxGeometry(sashDepth + 8, 2340, 65), sashFrameMat);
+    centerMullion.position.set(sashX, 1310, 2842.8);
+    facadeGroup.add(outerTopRail, outerBotSill, outerLeftJamb, outerRightJamb, centerMullion);
+
+    // 5-E) LEFT SIDE (+Z: z = 2875.3 ~ 3951.5, width = 1076.2mm): ENTRANCE DOOR ("왼쪽이 출입구 문")
+    const doorZCenter = 3413.4;
+    const doorW = 1076.2;
+    const doorStile = 46;
+    const doorTopRail = new THREE.Mesh(new THREE.BoxGeometry(64, doorStile, doorW), sashFrameMat);
+    doorTopRail.position.set(sashX, 2403, doorZCenter);
+    const doorBotRail = new THREE.Mesh(new THREE.BoxGeometry(64, doorStile + 10, doorW), sashFrameMat);
+    doorBotRail.position.set(sashX, 222, doorZCenter);
+    const doorLeftStile = new THREE.Mesh(new THREE.BoxGeometry(64, 2232, doorStile), sashFrameMat);
+    doorLeftStile.position.set(sashX, 1310, 3928.5);
+    const doorRightStile = new THREE.Mesh(new THREE.BoxGeometry(64, 2232, doorStile), sashFrameMat);
+    doorRightStile.position.set(sashX, 1310, 2898.3);
+    const doorGlass = new THREE.Mesh(new THREE.BoxGeometry(14, 2130, doorW - doorStile * 2), storefrontGlassMat);
+    doorGlass.position.set(sashX, 1312, doorZCenter);
+    facadeGroup.add(doorTopRail, doorBotRail, doorLeftStile, doorRightStile, doorGlass);
+
+    // Vertical Black Metal Pull Handle on Left Entrance Door (near center mullion at z = 2955)
+    [-46, 46].forEach((hxOffset) => {
+      const handleBar = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 520, 14), sashFrameMat);
+      handleBar.position.set(sashX + hxOffset, 1210, 2955);
+      const standTop = new THREE.Mesh(new THREE.BoxGeometry(46, 18, 18), sashFrameMat);
+      standTop.position.set(sashX + hxOffset * 0.5, 1430, 2955);
+      const standBot = new THREE.Mesh(new THREE.BoxGeometry(46, 18, 18), sashFrameMat);
+      standBot.position.set(sashX + hxOffset * 0.5, 990, 2955);
+      facadeGroup.add(handleBar, standTop, standBot);
+    });
+
+    // 5-F) RIGHT SIDE (-Z: z = 745.0 ~ 2810.3, width = 2065.3mm):
+    //      - Lower Fixed Glass Panels ("오른쪽 아래는 고정", y = 194 ~ 1520)
+    //      - Upper Push-Out Awning Window ("위에는 밀어서 열리는 문", y = 1520 ~ 2426)
+    const rightZCenter = 1777.65;
+    const rightW = 2065.3;
+
+    // Horizontal Intermediate Mullion Bar at y = 1000mm (aligned with bar counter top!)
+    const lowerHorizBar = new THREE.Mesh(new THREE.BoxGeometry(72, 46, rightW), sashFrameMat);
+    lowerHorizBar.position.set(sashX, 1000, rightZCenter);
+
+    // Main Horizontal Transom Bar at y = 1520mm (separating fixed lower glass & upper awning window!)
+    const midTransomBar = new THREE.Mesh(new THREE.BoxGeometry(88, 56, rightW), sashFrameMat);
+    midTransomBar.position.set(sashX, 1520, rightZCenter);
+
+    // Lower Fixed Glass Pane 1 (Bottom: y = 194 ~ 977)
+    const fixedGlassBot = new THREE.Mesh(new THREE.BoxGeometry(14, 783, rightW), storefrontGlassMat);
+    fixedGlassBot.position.set(sashX, 585.5, rightZCenter);
+
+    // Lower Fixed Glass Pane 2 (Middle: y = 1023 ~ 1492)
+    const fixedGlassMid = new THREE.Mesh(new THREE.BoxGeometry(14, 469, rightW), storefrontGlassMat);
+    fixedGlassMid.position.set(sashX, 1257.5, rightZCenter);
+    facadeGroup.add(lowerHorizBar, midTransomBar, fixedGlassBot, fixedGlassMid);
+
+    // Upper Push-Out Awning Window Group (Top-hinged at x = sashX, y = 2426, tilted outward toward +X!)
+    const awningH = 878;
+    const awningPivot = new THREE.Group();
+    awningPivot.position.set(sashX + 18, 2426, rightZCenter);
+    // Tilt outward toward +X street side by ~23 degrees (-0.40 rad around Z axis)
+    awningPivot.rotation.z = -0.40;
+
+    const awFrameThick = 46;
+    const awTopRail = new THREE.Mesh(new THREE.BoxGeometry(58, awFrameThick, rightW - 8), sashFrameMat);
+    awTopRail.position.set(0, -awFrameThick / 2, 0);
+    const awBotRail = new THREE.Mesh(new THREE.BoxGeometry(58, awFrameThick, rightW - 8), sashFrameMat);
+    awBotRail.position.set(0, -awningH + awFrameThick / 2, 0);
+    const awLeftStile = new THREE.Mesh(new THREE.BoxGeometry(58, awningH, awFrameThick), sashFrameMat);
+    awLeftStile.position.set(0, -awningH / 2, (rightW - 8) / 2 - awFrameThick / 2);
+    const awRightStile = new THREE.Mesh(new THREE.BoxGeometry(58, awningH, awFrameThick), sashFrameMat);
+    awRightStile.position.set(0, -awningH / 2, -(rightW - 8) / 2 + awFrameThick / 2);
+    const awGlass = new THREE.Mesh(
+      new THREE.BoxGeometry(14, awningH - awFrameThick * 2, rightW - awFrameThick * 2 - 8),
+      storefrontGlassMat
+    );
+    awGlass.position.set(0, -awningH / 2, 0);
+    awningPivot.add(awTopRail, awBotRail, awLeftStile, awRightStile, awGlass);
+    facadeGroup.add(awningPivot);
+
+    // Black Metal Friction Stay Support Arms holding the push-out awning window open on both sides
+    [775, 2780].forEach((armZ) => {
+      const stayArm = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 340, 10), sashFrameMat);
+      stayArm.position.set(sashX + 135, 1690, armZ);
+      stayArm.rotation.z = 1.18;
+      facadeGroup.add(stayArm);
+    });
+
+    // Subtle exterior storefront street illumination so the exposed concrete & black sash look crisp from outside
+    const facadeStreetLight = new THREE.PointLight(0xfff5e8, 0.95, 5200, 0);
+    facadeStreetLight.position.set(24500, 2500, 2380);
+    facadeGroup.add(facadeStreetLight);
+
+    dGroup.add(facadeGroup);
   } else if (fNum === 2) {
     // ------------------------------------------------------------------------
     // 2F SEMI-CIRCULAR CRAFT BEER BAR (QUẦY LẤY BIA) IN MATCHING WHITE MOSAIC + TERRACOTTA STYLE
@@ -1417,6 +1608,7 @@ function buildModel() {
 
     // 4. Inner Partition Walls (Photo 2 Raw Concrete & Framed Glass VIP Partitions)
     fData.inner_walls.forEach((w) => {
+      if (w.id === 'f1_front_glass') return; // Replaced by 1F Storefront Exterior Facade (Photo 4)
       const isGlass = !!w.glass;
       const mat = isGlass
         ? new THREE.MeshPhysicalMaterial({
@@ -1518,7 +1710,7 @@ function buildModel() {
     { f: 2, x: 6400, y: 2550, z: 2400 },
   ];
   warmHallLights.forEach((lp) => {
-    const pl = new THREE.PointLight(0xffdca8, 1.6, 7500);
+    const pl = new THREE.PointLight(0xffdca8, 0.85, 6500, 0);
     pl.position.set(lp.x, lp.y, lp.z);
     floorGroups[lp.f].add(pl);
   });
@@ -1577,6 +1769,15 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       camera.position.set(11000, 15500, 18500);
       controls.target.set(11500, 2200, 2200);
       banner.textContent = '3D 전체 완공 조감도 시점: 화이트 테라조 타일 바닥 + 노출 콘크리트 벽 + 1층 오픈키친';
+    } else if (preset === 'f1_facade') {
+      eyeLevelMode = true;
+      document.getElementById('toggle-eye-level').checked = true;
+      setCeilingVisibility(true);
+      updateFloorMode('1');
+      // Exact street-level front exterior perspective looking straight at the 1F Entrance Facade (matching Photo 4!)
+      camera.position.set(27200, 1650, 2380);
+      controls.target.set(17500, 1550, 2380);
+      banner.textContent = '🚪 1F 입구 외관 시점: 노출 콘크리트 파사드 + 블랙 샷시 & 유리 (좌측 출입문 / 우측 하단 고정창 / 우측 상단 프로젝트 개폐창)';
     } else if (preset === 'f1_walk') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
