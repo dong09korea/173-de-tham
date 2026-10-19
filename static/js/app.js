@@ -194,13 +194,14 @@ const antiqueBronzeMat = new THREE.MeshPhysicalMaterial({
   clearcoat: 0.2,
 });
 
-// Photo 3: Smooth Satin Deep Burgundy 2-Tier Bar Countertop Material
+// PANTONE 4975C RED INFERNO (HEX #4E0000 / RGB 79, 0, 5) Deep Burgundy 2-Tier Bar Countertop Material
 const terracottaCounterMat = new THREE.MeshPhysicalMaterial({
-  color: 0x4a121a,
-  roughness: 0.30,
-  metalness: 0.05,
-  clearcoat: 0.26,
-  clearcoatRoughness: 0.24,
+  color: 0x4e0000,
+  emissive: 0x140001,
+  roughness: 0.34,
+  metalness: 0.02,
+  clearcoat: 0.18,
+  clearcoatRoughness: 0.28,
 });
 
 // Photo 3: White Square Mosaic Tile Material (Bar Base & Kitchen Back Wall)
