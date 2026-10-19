@@ -194,13 +194,13 @@ const antiqueBronzeMat = new THREE.MeshPhysicalMaterial({
   clearcoat: 0.2,
 });
 
-// Photo 3: Smooth Satin Terracotta / Burnt Sienna 2-Tier Bar Countertop Material
+// Photo 3: Smooth Satin Deep Burgundy 2-Tier Bar Countertop Material
 const terracottaCounterMat = new THREE.MeshPhysicalMaterial({
-  color: 0x9b3722,
-  roughness: 0.28,
-  metalness: 0.04,
-  clearcoat: 0.28,
-  clearcoatRoughness: 0.22,
+  color: 0x4a121a,
+  roughness: 0.30,
+  metalness: 0.05,
+  clearcoat: 0.26,
+  clearcoatRoughness: 0.24,
 });
 
 // Photo 3: White Square Mosaic Tile Material (Bar Base & Kitchen Back Wall)
