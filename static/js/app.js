@@ -1266,7 +1266,8 @@ function buildArchitecturalDoorsAndToilets(fNum) {
   // TOILET INTERIOR FINISHES: 160cm BURGUNDY TILE WAINSCOT + LED STRIP + FLOOR
   // --------------------------------------------------------------------------
   if (fNum === 1) {
-    // 1-A) Toilet Floor Slabs (Burgundy Tile Floor)
+    // 1-A) Toilet & Vanity Floor Slabs (Burgundy Tile Floor across Men's WC, Vanity Area & Women's WC)
+    // Men's WC (Room 1, Left)
     const f1NamFloorShape = new THREE.Shape();
     [[765, 410], [2150, 410], [2150, 2656], [1974, 2750], [765, 2640]].forEach(([x, z], i) => {
       if (i === 0) f1NamFloorShape.moveTo(x, -z);
@@ -1280,8 +1281,23 @@ function buildArchitecturalDoorsAndToilets(fNum) {
     f1NamFloorMesh.position.y = 2;
     f1NamFloorMesh.receiveShadow = true;
 
+    // Common Washbasin / Vanity Area (Room 2, Middle - keeping burgundy tile floor as requested)
+    const f1SinkFloorShape = new THREE.Shape();
+    [[2150, 410], [3149, 410], [3149, 2770], [2150, 2656]].forEach(([x, z], i) => {
+      if (i === 0) f1SinkFloorShape.moveTo(x, -z);
+      else f1SinkFloorShape.lineTo(x, -z);
+    });
+    f1SinkFloorShape.closePath();
+    const f1SinkFloorGeom = new THREE.ExtrudeGeometry(f1SinkFloorShape, { depth: 4, bevelEnabled: false });
+    f1SinkFloorGeom.rotateX(-Math.PI / 2);
+    applyBoxUV(f1SinkFloorGeom, 400, 400);
+    const f1SinkFloorMesh = new THREE.Mesh(f1SinkFloorGeom, burgundyTileMat);
+    f1SinkFloorMesh.position.y = 2;
+    f1SinkFloorMesh.receiveShadow = true;
+
+    // Women's WC (Room 3, Right - now fully tiled with burgundy floor & wainscot)
     const f1NuFloorShape = new THREE.Shape();
-    [[2150, 410], [3050, 410], [3050, 2770], [2150, 2656]].forEach(([x, z], i) => {
+    [[3149, 410], [4344, 410], [4344, 2772], [3050, 2772], [3050, 1949], [3149, 1949]].forEach(([x, z], i) => {
       if (i === 0) f1NuFloorShape.moveTo(x, -z);
       else f1NuFloorShape.lineTo(x, -z);
     });
@@ -1293,32 +1309,44 @@ function buildArchitecturalDoorsAndToilets(fNum) {
     f1NuFloorMesh.position.y = 2;
     f1NuFloorMesh.receiveShadow = true;
 
-    g.add(f1NamFloorMesh, f1NuFloorMesh);
+    g.add(f1NamFloorMesh, f1SinkFloorMesh, f1NuFloorMesh);
 
     // 1-B) North Outer Wall Interior Burgundy Tile Lining (y: 0 ~ 1600mm) + LED Strip at 1600mm
-    const northTileW = 3050 - 765;
-    const northTile = new THREE.Mesh(new THREE.BoxGeometry(northTileW, 1600, 24), burgundyTileMat);
-    applyBoxUV(northTile.geometry, 480, 480);
-    northTile.position.set((765 + 3050) / 2, 800, 422);
-    northTile.receiveShadow = true;
+    // Men's WC North Wall Lining
+    const namNorthW = 2150 - 765;
+    const namNorthTile = new THREE.Mesh(new THREE.BoxGeometry(namNorthW, 1600, 24), burgundyTileMat);
+    applyBoxUV(namNorthTile.geometry, 480, 480);
+    namNorthTile.position.set((765 + 2150) / 2, 800, 422);
+    namNorthTile.receiveShadow = true;
+    const namNorthLed = new THREE.Mesh(new THREE.BoxGeometry(namNorthW, 22, 28), ledStripGlowMat);
+    namNorthLed.position.set((765 + 2150) / 2, 1600, 424);
 
-    const northLed = new THREE.Mesh(new THREE.BoxGeometry(northTileW, 22, 28), ledStripGlowMat);
-    northLed.position.set((765 + 3050) / 2, 1600, 424);
-    g.add(northTile, northLed);
+    // Women's WC North Wall Lining (Room 3, Right)
+    const nuNorthW = 4344 - 3149;
+    const nuNorthTile = new THREE.Mesh(new THREE.BoxGeometry(nuNorthW, 1600, 24), burgundyTileMat);
+    applyBoxUV(nuNorthTile.geometry, 480, 480);
+    nuNorthTile.position.set((3149 + 4344) / 2, 800, 422);
+    nuNorthTile.receiveShadow = true;
+    const nuNorthLed = new THREE.Mesh(new THREE.BoxGeometry(nuNorthW, 22, 28), ledStripGlowMat);
+    nuNorthLed.position.set((3149 + 4344) / 2, 1600, 424);
 
-    // 1-C) Ambient Warm Illumination from the 160cm LED Strip inside both restrooms
+    g.add(namNorthTile, namNorthLed, nuNorthTile, nuNorthLed);
+
+    // 1-C) Ambient Warm Illumination from 160cm LED Strips inside restrooms
     const namLight = new THREE.PointLight(0xffdfa8, 0.9, 3500, 0);
     namLight.position.set(1450, 1620, 1500);
     const nuLight = new THREE.PointLight(0xffdfa8, 0.9, 3500, 0);
-    nuLight.position.set(2600, 1620, 1600);
+    nuLight.position.set(3740, 1620, 1500);
     g.add(namLight, nuLight);
 
-    // Toilets and All Doors Completely Closed Flush with Wall
-    addToilet(1520, 920, 0);
-    addToilet(2600, 920, 0);
-    addDoor(2090, 2656, 710, -1.477);       // 1F WC Nam door - closed
-    addDoor(3050, 2700, 750, -Math.PI / 2);  // 1F WC Nu door - closed
-    addDoor(5355, 2850, 750, 0);             // 1F Kitchen/dishwashing door - closed
+    // 1-D) Porcelain Toilets (Men's WC in Left Room, Women's WC in Right Room, NONE in Middle Vanity)
+    addToilet(1450, 920, 0); // Men's WC (Left)
+    addToilet(3740, 920, 0); // Women's WC (Right)
+
+    // 1-E) All Doors Completely Closed Flush with Wall Frames
+    addDoor(2090, 2656, 710, 1.477);          // 1F WC Nam door - closed into wall
+    addDoor(3050, 2760, 780, Math.PI / 2);     // 1F WC Nu door - closed into wall
+    addDoor(5355, 2850, 750, 0);               // 1F Kitchen/dishwashing door - closed
   } else if (fNum === 2) {
     // 2-A) Toilet Floor Slab (Burgundy Tile Floor)
     const f2FloorShape = new THREE.Shape();
@@ -1357,7 +1385,7 @@ function buildArchitecturalDoorsAndToilets(fNum) {
     g.add(f2WcLight);
 
     addToilet(-1650, 520, 0);
-    addDoor(-1130, 2367, 720, -1.622); // 2F WC door - closed
+    addDoor(-1130, 2367, 720, 1.622); // 2F WC door - closed into wall
   } else if (fNum === 3) {
     // 3F WC
     const f3FloorShape = new THREE.Shape();
@@ -1379,7 +1407,7 @@ function buildArchitecturalDoorsAndToilets(fNum) {
     g.add(f3WcLight);
 
     addToilet(2280, 950, Math.PI / 2);
-    addDoor(3240, 1924, 800, 0.097); // 3F WC door - closed
+    addDoor(3240, 1924, 800, -0.097); // 3F WC door - closed into wall
   }
 
   return g;
@@ -2133,7 +2161,7 @@ function buildModel() {
     // 4. Inner Partition Walls (Photo 2 Raw Concrete & Framed Glass VIP Partitions)
     const wcWallIds = new Set([
       'f1_wc_nam_left', 'f1_wc_nam_bot', 'f1_wc_nam_right', 'f1_wc_nam_stub',
-      'f1_wc_nu_right', 'f1_wc_nu_bot',
+      'f1_wc_nu_right', 'f1_wc_nu_bot', 'f1_dish_left',
       'f2_wc_stub', 'f2_wc_right'
     ]);
     const kitchenTileWallIds = new Set(['f1_gas_right', 'f1_gas_left']);
