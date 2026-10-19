@@ -1865,32 +1865,33 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     });
 
     // 5-F) RIGHT SIDE (-Z: z = 745.0 ~ 2810.3, width = 2065.3mm):
-    //      - Lower Fixed Glass Panels ("오른쪽 아래는 고정", y = 194 ~ 1520)
-    //      - Upper Push-Out Awning Window ("위에는 밀어서 열리는 문", y = 1520 ~ 2426)
+    //      - Bottom: Fixed Glass Panel (y = 194 ~ 977)
+    //      - Middle: Push-Out Awning Window that opens outward (y = 1023 ~ 1872)
+    //      - Top: Fixed Transom Glass Panel (y = 1928 ~ 2426)
     const rightZCenter = 1777.65;
     const rightW = 2065.3;
 
-    // Horizontal Intermediate Mullion Bar at y = 1000mm (aligned with bar counter top!)
+    // Horizontal Intermediate Mullion Bar at y = 1000mm (aligned with bar counter top, spans y: 977 ~ 1023)
     const lowerHorizBar = new THREE.Mesh(new THREE.BoxGeometry(72, 46, rightW), sashFrameMat);
     lowerHorizBar.position.set(sashX, 1000, rightZCenter);
 
-    // Main Horizontal Transom Bar at y = 1520mm (separating fixed lower glass & upper awning window!)
+    // Main Horizontal Transom Bar at y = 1900mm (separating middle awning window & top fixed transom, spans y: 1872 ~ 1928)
     const midTransomBar = new THREE.Mesh(new THREE.BoxGeometry(88, 56, rightW), sashFrameMat);
-    midTransomBar.position.set(sashX, 1520, rightZCenter);
+    midTransomBar.position.set(sashX, 1900, rightZCenter);
 
-    // Lower Fixed Glass Pane 1 (Bottom: y = 194 ~ 977)
+    // Lower Fixed Glass Pane (Bottom: y = 194 ~ 977)
     const fixedGlassBot = new THREE.Mesh(new THREE.BoxGeometry(14, 783, rightW), storefrontGlassMat);
     fixedGlassBot.position.set(sashX, 585.5, rightZCenter);
 
-    // Lower Fixed Glass Pane 2 (Middle: y = 1023 ~ 1492)
-    const fixedGlassMid = new THREE.Mesh(new THREE.BoxGeometry(14, 469, rightW), storefrontGlassMat);
-    fixedGlassMid.position.set(sashX, 1257.5, rightZCenter);
-    facadeGroup.add(lowerHorizBar, midTransomBar, fixedGlassBot, fixedGlassMid);
+    // Upper Fixed Transom Glass Pane (Top: y = 1928 ~ 2426)
+    const fixedGlassTop = new THREE.Mesh(new THREE.BoxGeometry(14, 498, rightW), storefrontGlassMat);
+    fixedGlassTop.position.set(sashX, 2177, rightZCenter);
+    facadeGroup.add(lowerHorizBar, midTransomBar, fixedGlassBot, fixedGlassTop);
 
-    // Upper Push-Out Awning Window Group (Top-hinged at x = sashX + 35, y = 2426, pushed ALL THE WAY OUTWARD toward +X!)
-    const awningH = 878;
+    // Middle Push-Out Awning Window Group (Top-hinged at x = sashX + 35, y = 1872, pushed ALL THE WAY OUTWARD toward +X!)
+    const awningH = 848;
     const awningPivot = new THREE.Group();
-    awningPivot.position.set(sashX + 35, 2426, rightZCenter);
+    awningPivot.position.set(sashX + 35, 1872, rightZCenter);
     // Positive rotation.z swings negative-Y points (+y * sin(theta)) OUTWARD toward +X (street side) by ~77 degrees!
     awningPivot.rotation.z = 1.35;
 
@@ -1911,10 +1912,10 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     awningPivot.add(awTopRail, awBotRail, awLeftStile, awRightStile, awGlass);
     facadeGroup.add(awningPivot);
 
-    // Black Metal Friction Stay Support Arms holding the fully-open push-out awning window on both sides
+    // Burgundy / Dark Metal Friction Stay Support Arms holding the middle push-out awning window on both sides
     [775, 2780].forEach((armZ) => {
-      const stayArm = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 680, 10), sashFrameMat);
-      stayArm.position.set(sashX + 285, 2045, armZ);
+      const stayArm = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 620, 10), sashFrameMat);
+      stayArm.position.set(sashX + 270, 1510, armZ);
       stayArm.rotation.z = -0.76;
       facadeGroup.add(stayArm);
     });
