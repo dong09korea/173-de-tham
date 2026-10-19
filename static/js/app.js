@@ -768,6 +768,113 @@ function createFlutedRoundWallSconce(x, y, z, rotY = 0) {
 }
 
 // ============================================================================
+// TILTED WIDE WOODEN-FRAMED WALL MIRROR (Mounted Right Above Left Wall Sconces)
+// ============================================================================
+const mirrorEnvMap = (() => {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const envTex = pmrem.fromScene(new RoomEnvironment(), 0.025).texture;
+  pmrem.dispose();
+  return envTex;
+})();
+
+const mirrorFrameWoodMat = new THREE.MeshPhysicalMaterial({
+  map: PBR_TEX.timberTex,
+  color: 0x9c6f44,
+  roughness: 0.42,
+  metalness: 0.04,
+  clearcoat: 0.22,
+});
+
+const angledWallMirrorGlassMat = new THREE.MeshStandardMaterial({
+  color: 0xeef3f8,
+  emissive: 0x2a241e,
+  emissiveIntensity: 0.28,
+  roughness: 0.03,
+  metalness: 0.96,
+  envMap: mirrorEnvMap,
+  envMapIntensity: 1.35,
+});
+
+function createTiltedWideWallMirror(x, y, z, rotY = 0, width = 3100, height = 680) {
+  const g = new THREE.Group();
+  g.position.set(x, y, z);
+  g.rotation.y = rotY;
+
+  const topDepth = 175; // Top edge projects further out from wall (tilted downward like reference photo)
+  const botDepth = 36;  // Bottom edge sits close to wall
+  const frameT = 32;
+  const halfW = width / 2;
+  const halfH = height / 2;
+
+  // 1) Left & Right Wedge-Shaped Wooden Side Panels (Trapezoid profile flush against wall at z=0)
+  const sideShape = new THREE.Shape();
+  sideShape.moveTo(0, -halfH);
+  sideShape.lineTo(-botDepth, -halfH);
+  sideShape.lineTo(-topDepth, halfH);
+  sideShape.lineTo(0, halfH);
+  sideShape.closePath();
+
+  const sideExtrude = new THREE.ExtrudeGeometry(sideShape, { depth: frameT, bevelEnabled: false });
+  // Rotate so 2D X -> 3D Z (outward along -Z), 2D Y -> 3D Y, and extrude depth -> 3D X
+  sideExtrude.rotateY(-Math.PI / 2);
+  applyBoxUV(sideExtrude, 600, 600);
+
+  const leftSideMesh = new THREE.Mesh(sideExtrude, mirrorFrameWoodMat);
+  leftSideMesh.position.set(-halfW + frameT, 0, 0);
+  leftSideMesh.castShadow = true;
+
+  const rightSideMesh = new THREE.Mesh(sideExtrude, mirrorFrameWoodMat);
+  rightSideMesh.position.set(halfW, 0, 0);
+  rightSideMesh.castShadow = true;
+  g.add(leftSideMesh, rightSideMesh);
+
+  // 2) Top & Bottom Wooden Wedge Hood / Sill Boards connecting wall to front tilted bezel
+  const topBoardGeom = new THREE.BoxGeometry(width, frameT, topDepth);
+  applyBoxUV(topBoardGeom, 1200, 300);
+  const topBoard = new THREE.Mesh(topBoardGeom, mirrorFrameWoodMat);
+  topBoard.position.set(0, halfH - frameT / 2, -topDepth / 2);
+  topBoard.castShadow = true;
+
+  const botBoardGeom = new THREE.BoxGeometry(width, frameT, botDepth);
+  applyBoxUV(botBoardGeom, 1200, 300);
+  const botBoard = new THREE.Mesh(botBoardGeom, mirrorFrameWoodMat);
+  botBoard.position.set(0, -halfH + frameT / 2, -botDepth / 2);
+  botBoard.castShadow = true;
+  g.add(topBoard, botBoard);
+
+  // 3) Tilted Front Plane (Bezel Frame + Reflective Mirror Glass tilted downward into the room)
+  const dz = topDepth - botDepth;
+  const slantH = Math.sqrt(height * height + dz * dz);
+  const tiltAngle = Math.atan2(dz, height); // ~11.3 degrees downward tilt
+
+  const tiltedFace = new THREE.Group();
+  tiltedFace.position.set(0, 0, -(topDepth + botDepth) / 2);
+  tiltedFace.rotation.x = -tiltAngle;
+
+  // Reflective Mirror Glass Pane
+  const glassW = width - frameT * 2;
+  const glassH = slantH - frameT * 2;
+  const mirrorPane = new THREE.Mesh(new THREE.BoxGeometry(glassW, glassH, 10), angledWallMirrorGlassMat);
+  mirrorPane.position.set(0, 0, 6);
+  tiltedFace.add(mirrorPane);
+
+  // Front Wooden Bezel Frame Trim (Top, Bottom, Left, Right rails)
+  const bezelDepth = 22;
+  const fTop = new THREE.Mesh(new THREE.BoxGeometry(width, frameT, bezelDepth), mirrorFrameWoodMat);
+  fTop.position.set(0, slantH / 2 - frameT / 2, 0);
+  const fBot = new THREE.Mesh(new THREE.BoxGeometry(width, frameT, bezelDepth), mirrorFrameWoodMat);
+  fBot.position.set(0, -slantH / 2 + frameT / 2, 0);
+  const fLeft = new THREE.Mesh(new THREE.BoxGeometry(frameT, slantH - frameT * 2, bezelDepth), mirrorFrameWoodMat);
+  fLeft.position.set(-halfW + frameT / 2, 0, 0);
+  const fRight = new THREE.Mesh(new THREE.BoxGeometry(frameT, slantH - frameT * 2, bezelDepth), mirrorFrameWoodMat);
+  fRight.position.set(halfW - frameT / 2, 0, 0);
+  tiltedFace.add(fTop, fBot, fLeft, fRight);
+
+  g.add(tiltedFace);
+  return g;
+}
+
+// ============================================================================
 // REALISTIC 3D ARCHITECTURAL FURNITURE & EQUIPMENT BUILDER
 // ============================================================================
 function buildDetailedFixtureModel(fx, fNum) {
@@ -1633,6 +1740,23 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
       }
       dGroup.add(createFlutedRoundWallSconce(sx, sconceY, sz, sRotY));
     });
+
+    // ------------------------------------------------------------------------
+    // 7) 4 TILTED WIDE WOODEN-FRAMED MIRRORS RIGHT ABOVE LEFT WALL SCONCES
+    // ------------------------------------------------------------------------
+    const mirrorY = sconceY + 620; // Centered at 2840mm (spanning 2500mm ~ 3180mm, directly above the 2220mm wall sconces)
+    const leftWallMirrorX = [19600, 14000, 7600, 2000];
+
+    leftWallMirrorX.forEach((mx) => {
+      let mz = 4241.4;
+      let mRotY = 0;
+      if (mx < 9558.6) {
+        const t = (mx - -339.3) / (9558.6 - -339.3);
+        mz = 3707.6 + t * (4241.4 - 3707.6);
+        mRotY = slopeAngle;
+      }
+      dGroup.add(createTiltedWideWallMirror(mx, mirrorY, mz, mRotY, 3100, 680));
+    });
   } else if (fNum === 2) {
     // ------------------------------------------------------------------------
     // 2F SEMI-CIRCULAR CRAFT BEER BAR (QUẦY LẤY BIA) IN MATCHING WHITE MOSAIC + TERRACOTTA STYLE
@@ -1933,10 +2057,10 @@ function buildModel() {
       let sRot = 0;
       if (fNum === 1) {
         if (pt[0] > 18000) {
-          sx = 18440; // Outside side mosaic wall (x=18070) & countertop overhang (x=18220)
+          sx = 18520; // Outside side mosaic wall (x=18070) & countertop overhang (x=18220)
           sRot = Math.PI / 2; // Side L-bar seats face -X toward the side bar counter
         } else {
-          sz = 3425; // Outside front mosaic wall (z=3060) & countertop overhang (z=3210)
+          sz = 3520; // Outside front mosaic wall (z=3060) & countertop overhang (z=3210)
           sRot = 0; // Front bar seats face -Z toward the front bar counter
         }
       } else if (fNum === 2) {
