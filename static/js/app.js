@@ -75,6 +75,12 @@ function loadArchitecturalTextures() {
   // Natural Light Oak Wood Grain Texture (Matching user reference photo)
   const naturalOakTex = loadPbr('./static/textures/wood_natural_oak.jpg', 1, 1);
 
+  // Deep Reddish Mahogany Wood Grain Texture (Bar Table, matching user reference photo)
+  // Rotated 90deg so the vertical grain runs along the long axis of the bar counter
+  const mahoganyTex = loadPbr('./static/textures/wood_mahogany.png', 1, 1);
+  mahoganyTex.center.set(0.5, 0.5);
+  mahoganyTex.rotation = Math.PI / 2;
+
   const timberTex = loadPbr('./static/textures/wood_walnut_grain.jpg', 1, 1);
   const graniteTex = loadPbr('./static/textures/stone_speckled_granite.jpg', 1, 1);
 
@@ -97,6 +103,7 @@ function loadArchitecturalTextures() {
     wallWhitePaintTex,
     wallExposedConcreteTex,
     naturalOakTex,
+    mahoganyTex,
     whiteMosaicTex,
     canopyArtTex,
     facadeConcreteTex,
@@ -217,6 +224,18 @@ const terracottaCounterMat = new THREE.MeshPhysicalMaterial({
   metalness: 0.0,
   clearcoat: 0.24,
   clearcoatRoughness: 0.28,
+});
+
+// Deep Reddish Mahogany Wood 2-Tier Bar Countertop Material (User reference photo, ~10% darker tone)
+const barMahoganyMat = new THREE.MeshPhysicalMaterial({
+  map: PBR_TEX.mahoganyTex,
+  bumpMap: PBR_TEX.mahoganyTex,
+  bumpScale: 0.3,
+  color: 0xe6e6e6, // ~10% darker multiplier over the reference wood texture
+  roughness: 0.34,
+  metalness: 0.0,
+  clearcoat: 0.28,
+  clearcoatRoughness: 0.26,
 });
 
 // Photo 3: White Square Mosaic Tile Material (Bar Base & Kitchen Back Wall)
@@ -1606,34 +1625,65 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     // ------------------------------------------------------------------------
     // 1) PHOTO 3: OPEN KITCHEN BACK WALL (LOWER WHITE MOSAIC TILE + UPPER CREAM PAINT)
     // ------------------------------------------------------------------------
-    // Lower section (y: 0 ~ 2040mm, up to the red line just above the shelf bowls): White square mosaic tile
+    // Lower section (y: 0 ~ 2040mm): White square mosaic tile across full cooking & bar line (x: 8250 ~ 18225)
     const tileWallH = 2040;
-    const kitchenTileWall = new THREE.Mesh(new THREE.BoxGeometry(9250, tileWallH, 28), whiteMosaicTileMat);
+    const kitchenWallWidth = 9975;
+    const kitchenWallCenterX = 13238;
+    const kitchenTileWall = new THREE.Mesh(new THREE.BoxGeometry(kitchenWallWidth, tileWallH, 28), whiteMosaicTileMat);
     applyBoxUV(kitchenTileWall.geometry, 480, 480);
-    kitchenTileWall.position.set(13600, tileWallH / 2, 550);
+    kitchenTileWall.position.set(kitchenWallCenterX, tileWallH / 2, 550);
     kitchenTileWall.receiveShadow = true;
     dGroup.add(kitchenTileWall);
 
-    // Upper section (y: 2040mm ~ 3700mm ceiling): Warm Cream-colored paint (kitchen area only)
+    // Upper section (y: 2040mm ~ 3700mm ceiling): Warm Cream-colored paint (across full kitchen area)
     const creamWallH = Math.max(200, floorHeight - tileWallH);
-    const kitchenCreamUpperWall = new THREE.Mesh(new THREE.BoxGeometry(9250, creamWallH, 28), kitchenCreamPaintMat);
+    const kitchenCreamUpperWall = new THREE.Mesh(new THREE.BoxGeometry(kitchenWallWidth, creamWallH, 28), kitchenCreamPaintMat);
     applyBoxUV(kitchenCreamUpperWall.geometry, 2000, 2000);
-    kitchenCreamUpperWall.position.set(13600, tileWallH + creamWallH / 2, 550);
+    kitchenCreamUpperWall.position.set(kitchenWallCenterX, tileWallH + creamWallH / 2, 550);
     kitchenCreamUpperWall.receiveShadow = true;
     dGroup.add(kitchenCreamUpperWall);
 
-    // ------------------------------------------------------------------------
-    // 2) PHOTO 3: WALL-MOUNTED STAINLESS STEEL OPEN SHELVES + STACKED CERAMIC BOWLS, PLATES & POTS
-    // ------------------------------------------------------------------------
-    // Left Kitchen Stainless Exhaust Hood & Shelf Zone (x: 9200 ~ 12100)
-    const exhaustHood = new THREE.Mesh(new THREE.BoxGeometry(2850, 520, 680), stainlessMat);
-    exhaustHood.position.set(10650, 2260, 860);
-    exhaustHood.castShadow = true;
-    dGroup.add(exhaustHood);
+    // Slim architectural transition trim molding between tile and cream paint at y = 2040mm
+    const kitchenWallTrim = new THREE.Mesh(new THREE.BoxGeometry(kitchenWallWidth + 10, 14, 34), darkMetalMat);
+    kitchenWallTrim.position.set(kitchenWallCenterX, tileWallH, 550);
+    dGroup.add(kitchenWallTrim);
 
-    // Cooking line task light under the stainless exhaust hood
+    // ------------------------------------------------------------------------
+    // 2) PHOTO 3: OVERHEAD HOOD & DROP WALL (LOWER MOSAIC TILE + UPPER CREAM PAINT)
+    // ------------------------------------------------------------------------
+    // Overhead Exhaust Hood & Drop Box Zone (x: 9225 ~ 12075, z: 860)
+    // Seamlessly aligned with back wall finishes: Lower 2000~2040mm gets White Mosaic Tile, Upper 2040~2520mm gets Warm Cream Paint!
+    const hoodLowerTileH = 40; // from y=2000 to y=2040
+    const hoodUpperCreamH = 480; // from y=2040 to y=2520
+    const hoodW = 2850;
+    const hoodD = 680;
+    const hoodX = 10650;
+    const hoodZ = 860;
+
+    // Lower portion (y: 2000 ~ 2040mm + bottom face): White Mosaic Tile finish
+    const hoodLowerTile = new THREE.Mesh(new THREE.BoxGeometry(hoodW, hoodLowerTileH, hoodD), whiteMosaicTileMat);
+    applyBoxUV(hoodLowerTile.geometry, 480, 480);
+    hoodLowerTile.position.set(hoodX, 2000 + hoodLowerTileH / 2, hoodZ);
+    hoodLowerTile.castShadow = true;
+    hoodLowerTile.receiveShadow = true;
+    dGroup.add(hoodLowerTile);
+
+    // Upper portion (y: 2040 ~ 2520mm + top face): Warm Cream-colored Paint finish
+    const hoodUpperCream = new THREE.Mesh(new THREE.BoxGeometry(hoodW, hoodUpperCreamH, hoodD), kitchenCreamPaintMat);
+    applyBoxUV(hoodUpperCream.geometry, 2000, 2000);
+    hoodUpperCream.position.set(hoodX, 2040 + hoodUpperCreamH / 2, hoodZ);
+    hoodUpperCream.castShadow = true;
+    hoodUpperCream.receiveShadow = true;
+    dGroup.add(hoodUpperCream);
+
+    // Slim dark architectural trim at y = 2040mm connecting seamlessly with back wall tile line
+    const hoodTrim = new THREE.Mesh(new THREE.BoxGeometry(hoodW + 12, 14, hoodD + 12), darkMetalMat);
+    hoodTrim.position.set(hoodX, 2040, hoodZ);
+    dGroup.add(hoodTrim);
+
+    // Cooking line task light under the hood
     const hoodLight = new THREE.PointLight(0xffe4ad, 1.1, 5200, 0);
-    hoodLight.position.set(10650, 1920, 950);
+    hoodLight.position.set(hoodX, 1920, 950);
     dGroup.add(hoodLight);
 
     // Right Open Kitchen Stainless Steel Wall Shelves (x: 13600 ~ 18000, matching Photo 3 right side!)
@@ -1700,14 +1750,14 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     mosaicBaseL.receiveShadow = true;
 
     // Lower Natural Oak Dining Countertop (overhanging toward stools with thick 85mm fascia)
-    const terraTopL = new THREE.Mesh(new RoundedBoxGeometry(5240, 85, 580, 2, 6), terracottaCounterMat);
+    const terraTopL = new THREE.Mesh(new RoundedBoxGeometry(5240, 85, 580, 2, 6), barMahoganyMat);
     applyBoxUV(terraTopL.geometry, 1400, 600);
     terraTopL.position.set(11770, 912, 2920);
     terraTopL.castShadow = true;
     terraTopL.receiveShadow = true;
 
     // Upper Natural Oak Raised Service Step/Riser (2-tier bar counter)
-    const terraRiserL = new THREE.Mesh(new RoundedBoxGeometry(5240, 165, 250, 2, 6), terracottaCounterMat);
+    const terraRiserL = new THREE.Mesh(new RoundedBoxGeometry(5240, 165, 250, 2, 6), barMahoganyMat);
     applyBoxUV(terraRiserL.geometry, 1400, 600);
     terraRiserL.position.set(11770, 1030, 2705);
     terraRiserL.castShadow = true;
@@ -1721,13 +1771,13 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     mosaicBaseR.castShadow = true;
     mosaicBaseR.receiveShadow = true;
 
-    const terraTopR = new THREE.Mesh(new RoundedBoxGeometry(2840, 85, 580, 2, 6), terracottaCounterMat);
+    const terraTopR = new THREE.Mesh(new RoundedBoxGeometry(2840, 85, 580, 2, 6), barMahoganyMat);
     applyBoxUV(terraTopR.geometry, 1400, 600);
     terraTopR.position.set(16705, 912, 2920);
     terraTopR.castShadow = true;
     terraTopR.receiveShadow = true;
 
-    const terraRiserR = new THREE.Mesh(new RoundedBoxGeometry(2840, 165, 250, 2, 6), terracottaCounterMat);
+    const terraRiserR = new THREE.Mesh(new RoundedBoxGeometry(2840, 165, 250, 2, 6), barMahoganyMat);
     applyBoxUV(terraRiserR.geometry, 1400, 600);
     terraRiserR.position.set(16705, 1030, 2705);
     terraRiserR.castShadow = true;
@@ -1741,13 +1791,13 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     mosaicBaseSide.castShadow = true;
     mosaicBaseSide.receiveShadow = true;
 
-    const terraTopSide = new THREE.Mesh(new RoundedBoxGeometry(540, 85, 2500, 2, 6), terracottaCounterMat);
+    const terraTopSide = new THREE.Mesh(new RoundedBoxGeometry(540, 85, 2500, 2, 6), barMahoganyMat);
     applyBoxUV(terraTopSide.geometry, 600, 1400);
     terraTopSide.position.set(17950, 912, 1780);
     terraTopSide.castShadow = true;
     terraTopSide.receiveShadow = true;
 
-    const terraRiserSide = new THREE.Mesh(new RoundedBoxGeometry(250, 165, 2400, 2, 6), terracottaCounterMat);
+    const terraRiserSide = new THREE.Mesh(new RoundedBoxGeometry(250, 165, 2400, 2, 6), barMahoganyMat);
     applyBoxUV(terraRiserSide.geometry, 600, 1400);
     terraRiserSide.position.set(17805, 1030, 1730);
     terraRiserSide.castShadow = true;
@@ -2136,7 +2186,15 @@ function buildModel() {
             roughness: 0.82,
             metalness: 0.02,
           });
-      const mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
+
+      let mesh;
+      if (w.id === 'f1_col_1') {
+        // 1F Kitchen Pillar: White Mosaic Tile up to 2040mm + Warm Cream Paint above (seamlessly matching kitchen back wall!)
+        mesh = createSplitWallMesh(w.poly, w.h, 2040, whiteMosaicTileMat, kitchenCreamPaintMat, darkMetalMat);
+      } else {
+        mesh = createCleanWallMesh(w.poly, w.h, mat, !isGlass);
+      }
+
       mesh.userData = {
         name: `TẦNG ${fNum} 외벽/구조체 (${w.id})`,
         height: w.h,
@@ -2372,7 +2430,7 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Perspective matching Photo 3 (looking along the L-shaped terracotta bar & illustrated canopy!)
       camera.position.set(18750, 1620, 3550);
       controls.target.set(11800, 1500, 2150);
-      banner.textContent = '🍷 1F 오픈키친 바 시점: 오픈키친(화이트 타일 + 상부 크림색 페인트) + 내추럴 오크 & 버건디 타일 바 카운터';
+      banner.textContent = '🍷 1F 오픈키친 바 시점: 오픈키친(화이트 타일 + 상부 크림색 페인트) + 마호가니 우드 & 버건디 타일 바 카운터';
     } else if (preset === 'f1_dj') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
