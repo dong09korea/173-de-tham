@@ -38,6 +38,26 @@ controls.minDistance = 200;
 const textureLoader = new THREE.TextureLoader();
 
 // ============================================================================
+// DESIGN VARIANT (A/B COMPARISON)
+// - URL `?variant=B` loads the B design, default is the A design.
+// - Any B-only change is expressed as `pickVariant(aValue, bValue)` or `if (IS_VARIANT_B) {...}`
+//   so the A design always stays untouched for side-by-side comparison.
+// ============================================================================
+const DESIGN_VARIANT = new URLSearchParams(window.location.search).get('variant') === 'B' ? 'B' : 'A';
+const IS_VARIANT_B = DESIGN_VARIANT === 'B';
+
+// Helper: return the A-design value or the B-design value depending on the active variant
+function pickVariant(aValue, bValue) {
+  return IS_VARIANT_B ? bValue : aValue;
+}
+
+// Short description of what differs in each variant (shown in the bottom banner on load)
+const VARIANT_NOTES = {
+  A: 'A안 (기준안): 마호가니 우드 바 상판 + 버건디 타일 바 하부 + 주방 화이트 타일/크림 페인트 + 노출 콘크리트 벽',
+  B: 'B안 (비교안): 현재 A안과 동일 — 변경 요청 시 B안에만 반영됩니다',
+};
+
+// ============================================================================
 // HIGH-RESOLUTION ARCHITECTURAL PBR TEXTURES (Photo 1 Floor, Photo 2 Wall, Photo 3 Open Kitchen)
 // ============================================================================
 function loadArchitecturalTextures() {
@@ -2758,3 +2778,65 @@ if (btnClosePanel) {
 if (drawerBackdrop) {
   drawerBackdrop.addEventListener('click', closeDrawer);
 }
+
+// ============================================================================
+// A/B DESIGN VARIANT SWITCH (Keeps the exact same camera view when switching)
+// ============================================================================
+const VIEW_STATE_KEY = 'deTham3dViewState';
+
+function saveViewState() {
+  const state = {
+    cam: camera.position.toArray(),
+    target: controls.target.toArray(),
+    floorMode: activeFloorMode,
+    eyeLevel: eyeLevelMode,
+    ceiling: document.getElementById('toggle-ceiling').checked,
+    exposure: renderer.toneMappingExposure,
+  };
+  sessionStorage.setItem(VIEW_STATE_KEY, JSON.stringify(state));
+}
+
+function restoreViewState() {
+  const raw = sessionStorage.getItem(VIEW_STATE_KEY);
+  if (!raw) return false;
+  sessionStorage.removeItem(VIEW_STATE_KEY);
+  try {
+    const state = JSON.parse(raw);
+    updateFloorMode(state.floorMode || 'all');
+    setCeilingVisibility(!!state.ceiling);
+    eyeLevelMode = !!state.eyeLevel;
+    document.getElementById('toggle-eye-level').checked = eyeLevelMode;
+    if (typeof state.exposure === 'number') {
+      renderer.toneMappingExposure = state.exposure;
+      document.getElementById('slider-bloom').value = String(state.exposure);
+    }
+    camera.position.fromArray(state.cam);
+    controls.target.fromArray(state.target);
+    controls.update();
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function switchDesignVariant(variant) {
+  if (variant === DESIGN_VARIANT) return;
+  saveViewState();
+  const url = new URL(window.location.href);
+  if (variant === 'B') url.searchParams.set('variant', 'B');
+  else url.searchParams.delete('variant');
+  window.location.href = url.toString();
+}
+
+document.querySelectorAll('.variant-btn').forEach((btn) => {
+  btn.classList.toggle('active', btn.dataset.variant === DESIGN_VARIANT);
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    switchDesignVariant(btn.dataset.variant);
+  });
+});
+
+document.body.classList.toggle('variant-b', IS_VARIANT_B);
+document.title = `${document.title} · ${DESIGN_VARIANT}안`;
+restoreViewState();
+banner.textContent = VARIANT_NOTES[DESIGN_VARIANT];
