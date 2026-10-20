@@ -53,8 +53,8 @@ function pickVariant(aValue, bValue) {
 
 // Short description of what differs in each variant (shown in the bottom banner on load)
 const VARIANT_NOTES = {
-  A: 'A안 (기준안): 마호가니 우드 바 상판 + 버건디 타일 바 하부 + 주방 화이트 타일/크림 페인트 + 노출 콘크리트 벽',
-  B: 'B안 (비교안): 현재 A안과 동일 — 변경 요청 시 B안에만 반영됩니다',
+  A: 'A안 (기준안): 1F 버건디 프레임 외관 샷시 · 마호가니 우드 바 상판 + 버건디 타일 바 하부 · 노출 콘크리트 벽',
+  B: 'B안 (비교안): 1F·2F 실버 철제(은색) 샷시 · 마호가니 우드 바 상판 + 버건디 타일 바 하부 · 노출 콘크리트 벽',
 };
 
 // ============================================================================
@@ -1842,11 +1842,11 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
       metalness: 0.02,
     });
 
-    // Architectural Deep Burgundy Entrance Sash Frame Material (#4E1218)
+    // Architectural Entrance Sash Frame Material (A안: 버건디 #4E1218 / B안: 실버 철제 은색 #C8CED4)
     const sashFrameMat = new THREE.MeshStandardMaterial({
-      color: 0x4e1218,
-      roughness: 0.32,
-      metalness: 0.58,
+      color: pickVariant(0x4e1218, 0xc8ced4),
+      roughness: pickVariant(0.32, 0.28),
+      metalness: pickVariant(0.58, 0.88),
     });
 
     const thresholdStoneMat = new THREE.MeshStandardMaterial({
@@ -2025,10 +2025,11 @@ function buildInteriorSignatureDetails(fNum, floorHeight) {
     // Exact CAD f2_east_window opening: x = 23726.9 ~ 23929.7, z = 1270.3 ~ 4096.6 (width = 2826.3mm)
     // ------------------------------------------------------------------------
     const f2WinGroup = new THREE.Group();
+    // 2F Window Sash Frame Material (A안: 다크 메탈 #1A1C1F / B안: 실버 철제 은색 #C8CED4)
     const f2SashMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1c1f,
+      color: pickVariant(0x1a1c1f, 0xc8ced4),
       roughness: 0.28,
-      metalness: 0.78,
+      metalness: pickVariant(0.78, 0.88),
     });
     const f2GlassMat = new THREE.MeshPhysicalMaterial({
       color: 0xeef4f8,
@@ -2441,7 +2442,9 @@ document.querySelectorAll('.cam-btn').forEach((btn) => {
       // Street-level exterior perspective showing both 1F Entrance Facade & 2F 50/50 Push-Out Front Window
       camera.position.set(29800, 2500, 2500);
       controls.target.set(22000, 2650, 2500);
-      banner.textContent = '🚪 1F·2F 전면 외관 시점: 1층 노출 콘크리트 파사드(버건디 프레임 샷시) + 2층 전면 통유리(상하 50% 분할 상단 개폐창)';
+      banner.textContent = IS_VARIANT_B
+        ? '🚪 1F·2F 전면 외관 시점 [B안]: 1층 실버 철제(은색) 샷시 파사드 + 2층 전면 통유리(실버 철제 샷시)'
+        : '🚪 1F·2F 전면 외관 시점 [A안]: 1층 노출 콘크리트 파사드(버건디 프레임 샷시) + 2층 전면 통유리(상하 50% 분할)';
     } else if (preset === 'f1_walk') {
       eyeLevelMode = true;
       document.getElementById('toggle-eye-level').checked = true;
