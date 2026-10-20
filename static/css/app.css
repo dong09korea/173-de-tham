@@ -529,6 +529,54 @@ body {
   border-color: #38bdf8;
 }
 
+/* A/B Design Variant Switch (Segmented Toggle) */
+.variant-switch {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  gap: 2px;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 9px;
+  margin-right: 4px;
+}
+
+.variant-btn {
+  background: transparent;
+  color: #cbd5e1;
+  border: none;
+  border-radius: 7px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.variant-btn:hover {
+  color: #ffffff;
+  background: rgba(51, 65, 85, 0.95);
+}
+
+.variant-btn.active[data-variant="A"] {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.55);
+}
+
+.variant-btn.active[data-variant="B"] {
+  background: #d97706;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.6);
+}
+
+/* Subtle amber outline on the header so B design screenshots are instantly distinguishable */
+body.variant-b .top-bar {
+  border-color: rgba(217, 119, 6, 0.65);
+}
+
 /* Control Panel Header with Close Button */
 .panel-header {
   display: flex;
